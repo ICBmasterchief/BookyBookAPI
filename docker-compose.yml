@@ -1,0 +1,45 @@
+version: '3.4'
+ 
+networks: #useful for connect API to DB by service name in appsettings (for example, "ServerDB": "Server=db;) 
+    backend:       
+        driver: bridge
+volumes:
+    sqlserver-data:
+        driver: local
+
+services:
+    db:
+        container_name: BookyBookDB #dbContainer
+        image: mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04
+        restart: unless-stopped #always
+        ports:
+            - 1433:1433 #never change internal port!!!
+        networks:
+            - backend
+        volumes:
+            - sqlserver-data:/var/opt/mssql #mounted volumen in Docker
+            - C:/sqlserver-data:/var/opt/mssql  #bind mounted in Windows
+            #- ~/sqlserver-data:/var/opt/mssql  #bind mounted in Linux/Mac
+        environment:    #more secure if you use an .env file
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=<YourStrong@Passw0rd>
+    # api:
+    #     #container_name: apiContainer
+    #     #image: apidb-dockerdemo:1.2
+    #     ports:
+    #         - 7790:80   #never change internal port!!!
+    #     networks:
+    #         - backend
+    #     build:
+    #       context: .
+    #       dockerfile: BookyBook.API/Dockerfile
+    #     depends_on:
+    #         - db    #API without db running is useless
+
+   # web:
+        #container_name: webContainer
+   #     image: web:1.0
+    #    ports:
+     #       - 9000:8080 
+      #  depends_on:
+       #     - api

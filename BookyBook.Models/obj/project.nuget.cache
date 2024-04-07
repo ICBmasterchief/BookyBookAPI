@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "Qz4hKMwABmQ+otDwiU0ZmF4LT+v/BsbFJSEmE1Cqu0kwJ1kcD8lnuzu4CQQe91vCz7eLK92BHiehrD29bqCzAg==",
+  "success": true,
+  "projectFilePath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ignac\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.28\\microsoft.netcore.app.ref.6.0.28.nupkg.sha512",
+    "C:\\Users\\ignac\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.28\\microsoft.windowsdesktop.app.ref.6.0.28.nupkg.sha512",
+    "C:\\Users\\ignac\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.28\\microsoft.aspnetcore.app.ref.6.0.28.nupkg.sha512"
+  ],
+  "logs": []
+}
