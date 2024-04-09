@@ -12,26 +12,60 @@ public class BookController : ControllerBase
 {
 
     private readonly ILogger<BookController> _logger;
-    private readonly IUserService _userService;
+    private readonly IBookService _bookService;
 
     public BookController(ILogger<BookController> logger, IBookService bookService)
     {
         _logger = logger;
+        _bookService = bookService;
     }
 
-    [HttpGet(Name = "GetUsers")]
-    public ActionResult<IEnumerable<User>> GetUsers([FromQuery] UserQueryParameters userQueryParameters)
+    [HttpGet(Name = "GetBooks")]
+    public ActionResult<IEnumerable<Book>> GetBooks([FromQuery] BookQueryParameters bookQueryParameters)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
         try 
         {
-            var users = _userService.GetAllUsers(userQueryParameters);
-            return Ok(users);
+            var books = _bookService.GetAllBooks(bookQueryParameters);
+            return Ok(books);
         }     
         catch (Exception ex)
         {
             _logger.LogInformation(ex.ToString());
-            return BadRequest("No se han encontrado usuarios");
+            return BadRequest("No se han encontrado libros");
+        }
+    }
+
+    [HttpGet("{bookId}/borrowings", Name = "GetBorrowingsByBookId")]
+    public IActionResult GetBorrowingsByBookId(int bookId, [FromQuery] BookQueryParameters bookQueryParameters)
+    {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+        try
+        {
+            var borrowings = _bookService.GetBorrowingsByBookId(bookId, bookQueryParameters);
+            return Ok(borrowings);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex.ToString());
+           return BadRequest("No se han encontrado préstamos");
+        }
+    }
+
+    [HttpGet("{bookId}", Name = "GetBook")]
+    public IActionResult GetBook(int bookId)
+    {
+        try
+        {
+            if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+
+            var book = _bookService.GetBook(bookId);
+            return Ok(book);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogInformation(ex.ToString());
+           return NotFound("No encontrado el libro " + bookId);
         }
     }
 }

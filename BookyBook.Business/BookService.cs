@@ -5,6 +5,55 @@ using BookyBook.Models;
 namespace BookyBook.Business;
 public class BookService : IBookService
 {
+
+    private readonly IBookRepository _repository;
+    public BookService(IBookRepository repository)
+    {
+        _repository = repository;
+    }
+    public IEnumerable<Book> GetAllBooks(BookQueryParameters? bookQueryParameters)
+    {
+        return _repository.GetAllBooks(bookQueryParameters);
+    }
+    public IEnumerable<Borrowing> GetBorrowingsByBookId(int bookId, BookQueryParameters? bookQueryParameters)
+    {
+        return _repository.GetBorrowingsByBookId(bookId, bookQueryParameters);
+    }
+
+    public Book GetBook(int bookId)
+    {
+        return _repository.GetBook(bookId);
+    }
+
+    public void UpdateBook(int bookId, BookUpdateDTO bookUpdate)
+    {
+        var book = _repository.GetBook(bookId);
+        if (book == null)
+        {
+            throw new KeyNotFoundException($"Libro {bookId} no encontrado.");
+        }
+
+        book.Title = bookUpdate.Title;
+        book.Author = bookUpdate.Author;
+        book.Genre = bookUpdate.Genre;
+        book.Year = bookUpdate.Year;
+        book.Score = bookUpdate.Score;
+        _repository.UpdateBook(book);
+        _repository.SaveChanges();
+    }
+
+    public void AddBook(BookCreateDTO bookCreate)
+    {
+
+    }
+
+    public void DeleteBook(int bookId)
+    {
+
+    }
+
+
+
     // public readonly BookRepository bookData = new();
     // public Table BookTable = new();
     // private int existingBookIndex;

@@ -69,3 +69,4 @@ A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\Bo
 A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.API\obj\Debug\net6.0\BookyBook.API.pdb
 A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.API\obj\Debug\net6.0\BookyBook.API.genruntimeconfig.cache
 A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.API\obj\Debug\net6.0\ref\BookyBook.API.dll
+A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.API\obj\Debug\net6.0\BookyBook.API.sourcelink.json

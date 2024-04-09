@@ -15,3 +15,4 @@ A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\Bo
 A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.Business\obj\Debug\net6.0\refint\BookyBook.Business.dll
 A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.Business\obj\Debug\net6.0\BookyBook.Business.pdb
 A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.Business\obj\Debug\net6.0\ref\BookyBook.Business.dll
+A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.Business\obj\Debug\net6.0\BookyBook.Business.sourcelink.json

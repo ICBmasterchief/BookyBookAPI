@@ -4,6 +4,9 @@ namespace BookyBook.Data;
 public interface IBorrowingRepository
 {
     public void AddBorrowing(Borrowing borrowing);
-    public void GetRegisteredBorrowings();
-    public void SaveBorrowingData();
+    public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters = null);
+    public Borrowing GetBorrowing(int borrowingId);
+    public void UpdateBorrowing(Borrowing borrowing);
+    public void DeleteBorrowing(int borrowingId);
+    public void SaveChanges();
 }

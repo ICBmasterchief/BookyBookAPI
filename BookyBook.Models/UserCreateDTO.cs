@@ -4,12 +4,19 @@ namespace BookyBook.Models;
 
 public class UserCreateDTO
 {
+    
     [Required]
     [StringLength(100, ErrorMessage = "El nombre de Usuario debe tener menos de 100 caracteres")]
-    public string Owner { get; set; }
+    public string? Name { get; set; }
 
     [Required]
-    [Range(0.01, double.MaxValue, ErrorMessage = "El saldo inicial debe ser mayor que 0")]
-    public decimal InitialBalance { get; set; }
+    [RegularExpression(@"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$", ErrorMessage = "Tienes que introducir un email con formato válido.")]
+    [StringLength(100, ErrorMessage = "El email del usuario debe tener menos de 100 caracteres")]
+    public string? Email { get; set; }
+
+    [Required]
+    [StringLength(100, ErrorMessage = "La contraseña del usuario debe tener menos de 100 caracteres")]
+    public string? Password { get; set; }
+
 }
 

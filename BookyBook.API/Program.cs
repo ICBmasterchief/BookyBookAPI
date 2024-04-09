@@ -1,6 +1,7 @@
 using BookyBook.Data;
 using BookyBook.Business;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IUserService, UserService>();
@@ -12,6 +13,9 @@ builder.Services.AddScoped<IBorrowingRepository, BorrowingRepository>();
 
 // Obteniendo la cadena de conexión desde appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("ServerDB_localhost");
+
+// builder.Services.AddControllers().AddJsonOptions(x =>
+//    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
 builder.Services.AddDbContext<BookyBookContext>(options =>
     options.UseSqlServer(connectionString)

@@ -9,78 +9,106 @@ public class UserRepository : IUserRepository
 
     private readonly BookyBookContext _context;
 
-        public UserRepository(BookyBookContext context)
+    public UserRepository(BookyBookContext context)
+    {
+        _context = context;
+    }
+
+    public void AddUser(User user)
+    {
+        _context.Users.Add(user);
+    }
+
+    public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters)
+    {
+
+        var query = _context.Users.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(userQueryParameters.Name))
         {
-            _context = context;
+            query = query.Where(usr => usr.Name.Contains(userQueryParameters.Name));
         }
 
-        public void AddUser(User user)
+        if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))
         {
-            _context.Users.Add(user);
+            query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email));
         }
 
-         public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters) {
-
-            var query = _context.Users.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(userQueryParameters.Name))
-            {
-                query = query.Where(usr => usr.Name.Contains(userQueryParameters.Name));
-            }
-
-            if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))
-            {
-                query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email));
-            }
-
-            if (userQueryParameters.fromDate.HasValue && userQueryParameters.toDate.HasValue)
-            {
-                query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value 
-                                        && usr.RegistrationDate <= userQueryParameters.toDate.Value);
-            }
-            else if (userQueryParameters.fromDate.HasValue)
-            {
-                query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value);
-            }
-            else if (userQueryParameters.toDate.HasValue)
-            {
-                query = query.Where(usr => usr.RegistrationDate <= userQueryParameters.toDate.Value);
-            }
-
-            var result = query.ToList();
-
-            return result;
-        }
-
-        public User GetUser(int userId)
+        if (userQueryParameters.fromDate.HasValue && userQueryParameters.toDate.HasValue)
         {
-            var user = _context.Users.FirstOrDefault(usr => usr.IdNumber == userId);
-            return user;
+            query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value 
+                                    && usr.RegistrationDate <= userQueryParameters.toDate.Value);
+        }
+        else if (userQueryParameters.fromDate.HasValue)
+        {
+            query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value);
+        }
+        else if (userQueryParameters.toDate.HasValue)
+        {
+            query = query.Where(usr => usr.RegistrationDate <= userQueryParameters.toDate.Value);
         }
 
+        var result = query.ToList();
 
-        public void UpdateUser(User user)
-        {
-            // En EF Core, si el objeto ya está siendo rastreado, actualizar sus propiedades
-            // y llamar a SaveChanges() es suficiente para actualizarlo en la base de datos.
-            // Asegúrate de que el estado del objeto sea 'Modified' si es necesario.
-            _context.Entry(user).State = EntityState.Modified;
+        return result;
+    }
+
+    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters)
+    {
+        var user = _context.Users
+            .Include(usr => usr.Borrowings) // Incluir prestamos relacionados, pero ojo con referencia circular ;-)
+            .FirstOrDefault(usr => usr.IdNumber == userId);
+
+        if (user is null) {
+            throw new KeyNotFoundException("User not found.");
         }
 
-        public void DeleteUser(int userId) 
+        var query = user?.Borrowings.AsQueryable();
+
+        if (userQueryParameters.fromDate.HasValue)
         {
-            var user = GetUser(userId);
-            if (user is null) {
-                throw new KeyNotFoundException("User not found.");
-            }
-            _context.Users.Remove(user);
-            SaveChanges();
+            query = query.Where(t => t.BorrowingDate >= userQueryParameters.fromDate.Value);
         }
-        
-        public void SaveChanges()
+
+        if (userQueryParameters.toDate.HasValue)
         {
-            _context.SaveChanges();
+            query = query.Where(t => t.BorrowingDate <= userQueryParameters.toDate.Value);
         }
+
+        var result = query.ToList();
+
+        return result;
+    }
+
+    public User GetUser(int userId)
+    {
+        var user = _context.Users.FirstOrDefault(usr => usr.IdNumber == userId);
+        return user;
+    }
+
+
+    public void UpdateUser(User user)
+    {
+        // En EF Core, si el objeto ya está siendo rastreado, actualizar sus propiedades
+        // y llamar a SaveChanges() es suficiente para actualizarlo en la base de datos.
+        // Asegúrate de que el estado del objeto sea 'Modified' si es necesario.
+        _context.Entry(user).State = EntityState.Modified;
+    }
+
+    public void DeleteUser(int userId) 
+    {
+        var user = GetUser(userId);
+        if (user is null) {
+            throw new KeyNotFoundException("User not found.");
+        }
+        _context.Users.Remove(user);
+        SaveChanges();
+    }
+    
+    public void SaveChanges()
+    {
+        _context.SaveChanges();
+    }
 
 
 

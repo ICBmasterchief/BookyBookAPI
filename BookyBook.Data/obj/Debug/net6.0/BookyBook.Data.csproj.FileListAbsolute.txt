@@ -13,3 +13,4 @@ A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\Bo
 A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.Data\obj\Debug\net6.0\refint\BookyBook.Data.dll
 A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.Data\obj\Debug\net6.0\BookyBook.Data.pdb
 A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.Data\obj\Debug\net6.0\ref\BookyBook.Data.dll
+A:\CURSO DAW\Desarrollo web en entorno servidor\proyectos dotnet\BookyBookAPI\BookyBook.Data\obj\Debug\net6.0\BookyBook.Data.sourcelink.json

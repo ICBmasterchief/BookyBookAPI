@@ -9,11 +9,48 @@ using Microsoft.VisualBasic;
 namespace BookyBook.Business;
 public class UserService : IUserService
 {
+    private readonly IUserRepository _repository;
+    public UserService(IUserRepository repository)
+    {
+        _repository = repository;
+    }
     public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters)
     {
-        return new List<User>();
+        return _repository.GetAllUsers(userQueryParameters);
+    }
+    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters)
+    {
+        return _repository.GetBorrowingsByUserId(userId, userQueryParameters);
     }
 
+    public User GetUser(int userId)
+    {
+        return _repository.GetUser(userId);
+    }
+
+    public void UpdateUser(int userId, UserUpdateDTO userUpdate)
+    {
+        var user = _repository.GetUser(userId);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
+        }
+
+        user.Name = userUpdate.Name;
+        user.Password = userUpdate.Password;
+        _repository.UpdateUser(user);
+        _repository.SaveChanges();
+    }
+
+    public void AddUser(UserCreateDTO userCreate)
+    {
+
+    }
+
+    public void DeleteUser(int userId)
+    {
+
+    }
 
 
 

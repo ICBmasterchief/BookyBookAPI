@@ -6,6 +6,47 @@ using BookyBook.Models;
 namespace BookyBook.Business;
 public class BorrowingService : IBorrowingService
 {
+
+    private readonly IBorrowingRepository _repository;
+    public BorrowingService(IBorrowingRepository repository)
+    {
+        _repository = repository;
+    }
+    public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters)
+    {
+        return _repository.GetAllBorrowings(borrowingQueryParameters);
+    }
+
+    public Borrowing GetBorrowing(int borrowingId)
+    {
+        return _repository.GetBorrowing(borrowingId);
+    }
+
+    public void UpdateBorrowing(int borrowingId, BorrowingUpdateDTO borrowingUpdate)
+    {
+        var borrowing = _repository.GetBorrowing(borrowingId);
+        if (borrowing == null)
+        {
+            throw new KeyNotFoundException($"Préstamo {borrowingId} no encontrado.");
+        }
+
+        borrowing.Returned = borrowingUpdate.Returned;
+        borrowing.ReturnedDate = borrowingUpdate.ReturnedDate;
+        _repository.UpdateBorrowing(borrowing);
+        _repository.SaveChanges();
+    }
+
+    public void AddBorrowing(BorrowingCreateDTO borrowingCreate)
+    {
+
+    }
+
+    public void DeleteBorrowing(int borrowingId)
+    {
+
+    }
+
+
     // public readonly BorrowingRepository borrowingData = new();
     // public readonly UserService userService = new();
     // public readonly BookService bookService = new();
