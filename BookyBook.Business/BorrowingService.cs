@@ -14,12 +14,68 @@ public class BorrowingService : IBorrowingService
     }
     public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters)
     {
-        return _repository.GetAllBorrowings(borrowingQueryParameters);
+        var query = _repository.GetAllBorrowings(borrowingQueryParameters).AsQueryable();
+
+        if (borrowingQueryParameters.Returned != null)
+        {
+            query = query.Where(bw => bw.Returned == borrowingQueryParameters.Returned);
+        }
+
+        if (borrowingQueryParameters.UserId != null)
+        {
+            query = query.Where(bw => bw.UserId.ToString().Contains(borrowingQueryParameters.UserId.ToString()));
+        }
+
+        if (borrowingQueryParameters.BookId != null)
+        {
+            query = query.Where(bw => bw.BookId.ToString().Contains(borrowingQueryParameters.BookId.ToString()));
+        }
+
+        if (borrowingQueryParameters.fromDate.HasValue && borrowingQueryParameters.toDate.HasValue)
+        {
+            query = query.Where(bw => bw.BorrowingDate >= borrowingQueryParameters.fromDate.Value 
+                                    && bw.BorrowingDate <= borrowingQueryParameters.toDate.Value);
+        }
+        else if (borrowingQueryParameters.fromDate.HasValue)
+        {
+            query = query.Where(bw => bw.BorrowingDate >= borrowingQueryParameters.fromDate.Value);
+        }
+        else if (borrowingQueryParameters.toDate.HasValue)
+        {
+            query = query.Where(bw => bw.BorrowingDate <= borrowingQueryParameters.toDate.Value);
+        }
+
+         if (string.IsNullOrWhiteSpace(borrowingQueryParameters.fromPenaltyFee.ToString()) &&
+             string.IsNullOrWhiteSpace(borrowingQueryParameters.toPenaltyFee.ToString()))
+        {
+            query = query.Where(bw => bw.BorrowingDate >= borrowingQueryParameters.fromDate.Value 
+                                    && bw.BorrowingDate <= borrowingQueryParameters.toDate.Value);
+        }
+        else if (string.IsNullOrWhiteSpace(borrowingQueryParameters.fromPenaltyFee.ToString()))
+        {
+            query = query.Where(bw => bw.PenaltyFee >= borrowingQueryParameters.fromPenaltyFee);
+        }
+        else if (string.IsNullOrWhiteSpace(borrowingQueryParameters.toPenaltyFee.ToString()))
+        {
+            query = query.Where(bw => bw.PenaltyFee <= borrowingQueryParameters.toPenaltyFee);
+        }
+
+        var result = query.ToList();
+
+        return result;
     }
 
     public Borrowing GetBorrowing(int borrowingId)
     {
         return _repository.GetBorrowing(borrowingId);
+    }
+
+    public Borrowing AddBorrowing(BorrowingCreateDTO borrowingCreate)
+    {
+        var borrowing = new Borrowing(borrowingCreate.UserId, borrowingCreate.BookId);
+            _repository.AddBorrowing(borrowing);
+            _repository.SaveChanges();
+            return borrowing;
     }
 
     public void UpdateBorrowing(int borrowingId, BorrowingUpdateDTO borrowingUpdate)
@@ -36,14 +92,15 @@ public class BorrowingService : IBorrowingService
         _repository.SaveChanges();
     }
 
-    public void AddBorrowing(BorrowingCreateDTO borrowingCreate)
-    {
-
-    }
-
     public void DeleteBorrowing(int borrowingId)
     {
+        var borrowing = _repository.GetBorrowing(borrowingId);
+        if (borrowing == null)
+        {
+            throw new KeyNotFoundException($"Usuario {borrowingId} no encontrado.");
+        }
 
+        _repository.DeleteBorrowing(borrowingId);
     }
 
 

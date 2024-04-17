@@ -31,7 +31,7 @@ public class BorrowingController : ControllerBase
         }     
         catch (Exception ex)
         {
-            _logger.LogInformation(ex.ToString());
+            _logger.LogInformation(ex.Message);
             return BadRequest("No se han encontrado libros");
         }
     }
@@ -49,8 +49,58 @@ public class BorrowingController : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogInformation(ex.ToString());
+            _logger.LogInformation(ex.Message);
            return NotFound("No encontrado el libro " + borrowingId);
         }
     }
+
+    [HttpPost()]
+    public IActionResult CreateBorrowing([FromBody] BorrowingCreateDTO borrowingCreate)
+    {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+        try {
+            var borrowing = _borrowingService.AddBorrowing(borrowingCreate);
+            return Ok(borrowing);
+        }     
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex.Message);
+            return BadRequest("No se ha podido crear el préstamo");
+        }
+        
+    }
+
+    [HttpPut("{borrowingId}")]
+    public IActionResult UpdateBorrowing(int borrowingId, [FromBody] BorrowingUpdateDTO borrowingCreate)
+    {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+        try
+        {
+            _borrowingService.UpdateBorrowing(borrowingId, borrowingCreate);
+            //return NoContent();
+            return Ok(_borrowingService.GetBorrowing(borrowingId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogInformation(ex.Message);
+           return NotFound("No se ha podido actualizar el préstamo");
+        }
+    }
+
+    [HttpDelete("{borrowingId}")]
+    public IActionResult DeleteBorrowing(int borrowingId)
+    {
+        try
+        {
+            _borrowingService.DeleteBorrowing(borrowingId);
+            //return NoContent();
+            return Ok(_borrowingService.GetBorrowing(borrowingId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogInformation(ex.Message);
+            return NotFound("No se ha podido eliminar el préstamo");
+        }
+    }
+
 }

@@ -3,29 +3,91 @@ using System.Runtime.CompilerServices;
 using BookyBook.Data;
 using BookyBook.Models;
 //using Spectre.Console;
-using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace BookyBook.Business;
 public class UserService : IUserService
 {
+    private readonly IConfiguration _configuration;
     private readonly IUserRepository _repository;
-    public UserService(IUserRepository repository)
+
+    public UserService(IConfiguration configuration, IUserRepository repository)
     {
+        _configuration = configuration;
         _repository = repository;
     }
     public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters)
     {
-        return _repository.GetAllUsers(userQueryParameters);
+        var query = _repository.GetAllUsers(userQueryParameters).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(userQueryParameters.Name))
+        {
+            query = query.Where(usr => usr.Name.Contains(userQueryParameters.Name));
+        }
+
+        if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))
+        {
+            query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email));
+        }
+
+        if (userQueryParameters.fromDate.HasValue && userQueryParameters.toDate.HasValue)
+        {
+            query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value 
+                                    && usr.RegistrationDate <= userQueryParameters.toDate.Value);
+        }
+        else if (userQueryParameters.fromDate.HasValue)
+        {
+            query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value);
+        }
+        else if (userQueryParameters.toDate.HasValue)
+        {
+            query = query.Where(usr => usr.RegistrationDate <= userQueryParameters.toDate.Value);
+        }
+
+        var result = query.ToList();
+
+        return result;
     }
     public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters)
     {
-        return _repository.GetBorrowingsByUserId(userId, userQueryParameters);
+        var query = _repository.GetBorrowingsByUserId(userId, userQueryParameters).AsQueryable();
+
+        if (userQueryParameters.fromDate.HasValue)
+        {
+            query = query.Where(t => t.BorrowingDate >= userQueryParameters.fromDate.Value);
+        }
+
+        if (userQueryParameters.toDate.HasValue)
+        {
+            query = query.Where(t => t.BorrowingDate <= userQueryParameters.toDate.Value);
+        }
+
+        var result = query.ToList();
+
+        return result;
     }
 
     public User GetUser(int userId)
     {
         return _repository.GetUser(userId);
+    }
+
+    public string AddUser(UserDtoIn userDTOIn)
+    {   
+        var parameter = new UserQueryParameters (userDTOIn.UserName, userDTOIn.Email);
+        if (GetAllUsers(parameter) != null)
+        {
+          throw new KeyNotFoundException($"El email {userDTOIn.Email} ya existe");   
+        }
+        var user = new User(userDTOIn.UserName, userDTOIn.Email, userDTOIn.Password);
+        _repository.AddUser(user);
+        _repository.SaveChanges();
+        var newUser = _repository.AddUserFromCredentials(userDTOIn);
+        return GenerateToken(newUser);
     }
 
     public void UpdateUser(int userId, UserUpdateDTO userUpdate)
@@ -42,18 +104,69 @@ public class UserService : IUserService
         _repository.SaveChanges();
     }
 
-    public void AddUser(UserCreateDTO userCreate)
-    {
-
-    }
-
     public void DeleteUser(int userId)
     {
+        var user = _repository.GetUser(userId);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
+        }
+
+        _repository.DeleteUser(userId);
 
     }
 
+    
+    public string Login(LoginDtoIn loginDtoIn) {
+        var user = _repository.GetUserFromCredentials(loginDtoIn);
+        if (user.Email == "ignaciocasaus1cns@gmail.com")
+        {
+            user.Role = Roles.Admin;
+        }
+        var userLogin = new UserDTOOut {UserId = user.IdNumber, UserName = user.Name, Email = user.Email, RegistrationDate = user.RegistrationDate, PenaltyFee = user.PenaltyFee, Borrowings = user.Borrowings, Role = user.Role};
+        return GenerateToken(userLogin);
+    }
 
+    public string GenerateToken(UserDTOOut userDTOOut) {
+        var key = Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]); 
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Issuer = _configuration["JWT:ValidIssuer"],
+            Audience = _configuration["JWT:ValidAudience"],
+            Subject = new ClaimsIdentity(new Claim[] 
+                {
+                    new Claim(ClaimTypes.NameIdentifier, Convert.ToString(userDTOOut.UserId)),
+                    new Claim(ClaimTypes.Name, userDTOOut.UserName),
+                    new Claim(ClaimTypes.Role, userDTOOut.Role),
+                    new Claim(ClaimTypes.Email, userDTOOut.Email),
+                    new Claim("myCustomClaim", "myCustomClaimValue"),
+                    // add other claims
+                }),
+            Expires = DateTime.UtcNow.AddDays(7), // AddMinutes(60)
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
 
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenString = tokenHandler.WriteToken(token);
+        return tokenString;
+    } 
+    public bool HasAccessToResource(int requestedUserID, ClaimsPrincipal user) 
+    {
+        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out int userId)) 
+        { 
+            return false; 
+        }
+        var isOwnResource = userId == requestedUserID;
+
+        var roleClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+        if (roleClaim != null) return false;
+        var isAdmin = roleClaim!.Value == Roles.Admin;
+        
+        var hasAccess = isOwnResource || isAdmin;
+        return hasAccess;
+    }
 
 
 
@@ -124,7 +237,7 @@ public class UserService : IUserService
     //                 userData.AddUser(user);
     //                 AnsiConsole.MarkupLine("[yellow]User created succesfully![/]");
     //         }
-            
+
     //     } else {
     //         AnsiConsole.MarkupLine("[yellow]ERROR: Passwords do not match.[/]");
     //     }

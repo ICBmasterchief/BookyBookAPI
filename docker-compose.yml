@@ -1,28 +1,40 @@
 version: '3.4'
  
-networks: #useful for connect API to DB by service name in appsettings (for example, "ServerDB": "Server=db;) 
-    backend:       
-        driver: bridge
-volumes:
-    sqlserver-data:
-        driver: local
+networks:
+    bookybook:
 
 services:
-    db:
-        container_name: BookyBookDB #dbContainer
-        image: mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04
-        restart: unless-stopped #always
+    db: 
+        image: mcr.microsoft.com/mssql/server:2019-CU21-ubuntu-20.04
+        restart: always 
         ports:
-            - 1433:1433 #never change internal port!!!
-        networks:
-            - backend
-        volumes:
-            - sqlserver-data:/var/opt/mssql #mounted volumen in Docker
-            - C:/sqlserver-data:/var/opt/mssql  #bind mounted in Windows
-            #- ~/sqlserver-data:/var/opt/mssql  #bind mounted in Linux/Mac
-        environment:    #more secure if you use an .env file
+            - 0977:1433
+        environment:
             - ACCEPT_EULA=Y
             - MSSQL_SA_PASSWORD=<YourStrong@Passw0rd>
+        networks:
+            - bookybook 
+        volumes:
+            - db-data:/var/opt/mssql
+        healthcheck:
+            test: ["CMD", "sqlcmd", "-U", "sa", "-P", "<YourStrong@Passw0rd>", "-Q", "SELECT 1"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+
+    api:
+        restart: unless-stopped 
+        ports:
+            - 7790:80 
+        build: 
+          context: .
+          dockerfile: Dockerfile
+        depends_on:
+            - db
+        networks:
+            - bookybook
+
+
     # api:
     #     #container_name: apiContainer
     #     #image: apidb-dockerdemo:1.2
@@ -43,3 +55,6 @@ services:
      #       - 9000:8080 
       #  depends_on:
        #     - api
+
+volumes:
+    db-data: {}

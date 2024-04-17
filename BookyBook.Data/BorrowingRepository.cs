@@ -20,56 +20,11 @@ public class BorrowingRepository: IBorrowingRepository
 
     public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters)
     {
-
-        var query = _context.Borrowings.AsQueryable();
-
-        if (borrowingQueryParameters.Returned != null)
-        {
-            query = query.Where(bk => bk.Returned == borrowingQueryParameters.Returned);
+        var borrowings = _context.Borrowings.ToList();
+        if (borrowings is null) {
+            throw new InvalidOperationException("Error al intentar obtener los préstamos.");
         }
-
-        if (borrowingQueryParameters.UserId != null)
-        {
-            query = query.Where(bk => bk.UserId.ToString().Contains(borrowingQueryParameters.UserId.ToString()));
-        }
-
-        if (borrowingQueryParameters.BookId != null)
-        {
-            query = query.Where(bk => bk.BookId.ToString().Contains(borrowingQueryParameters.BookId.ToString()));
-        }
-
-        if (borrowingQueryParameters.fromDate.HasValue && borrowingQueryParameters.toDate.HasValue)
-        {
-            query = query.Where(bw => bw.BorrowingDate >= borrowingQueryParameters.fromDate.Value 
-                                    && bw.BorrowingDate <= borrowingQueryParameters.toDate.Value);
-        }
-        else if (borrowingQueryParameters.fromDate.HasValue)
-        {
-            query = query.Where(bw => bw.BorrowingDate >= borrowingQueryParameters.fromDate.Value);
-        }
-        else if (borrowingQueryParameters.toDate.HasValue)
-        {
-            query = query.Where(bw => bw.BorrowingDate <= borrowingQueryParameters.toDate.Value);
-        }
-
-         if (string.IsNullOrWhiteSpace(borrowingQueryParameters.fromPenaltyFee.ToString()) &&
-             string.IsNullOrWhiteSpace(borrowingQueryParameters.toPenaltyFee.ToString()))
-        {
-            query = query.Where(bw => bw.BorrowingDate >= borrowingQueryParameters.fromDate.Value 
-                                    && bw.BorrowingDate <= borrowingQueryParameters.toDate.Value);
-        }
-        else if (string.IsNullOrWhiteSpace(borrowingQueryParameters.fromPenaltyFee.ToString()))
-        {
-            query = query.Where(bw => bw.PenaltyFee >= borrowingQueryParameters.fromPenaltyFee);
-        }
-        else if (string.IsNullOrWhiteSpace(borrowingQueryParameters.toPenaltyFee.ToString()))
-        {
-            query = query.Where(bw => bw.PenaltyFee <= borrowingQueryParameters.toPenaltyFee);
-        }
-
-        var result = query.ToList();
-
-        return result;
+        return borrowings;
     }
 
     public Borrowing GetBorrowing(int borrowingId)

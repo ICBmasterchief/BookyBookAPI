@@ -5,7 +5,7 @@ namespace BookyBook.Business;
 public interface IBorrowingService
 {
 
-    public void AddBorrowing(BorrowingCreateDTO borrowingCreate);
+    public Borrowing AddBorrowing(BorrowingCreateDTO borrowingCreate);
     public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters = null);
     public Borrowing GetBorrowing(int borrowingId);
     public void UpdateBorrowing(int borrowingId, BorrowingUpdateDTO borrowingUpdate);

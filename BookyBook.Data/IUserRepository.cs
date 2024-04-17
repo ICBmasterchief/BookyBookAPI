@@ -10,4 +10,6 @@ public interface IUserRepository
     public void UpdateUser(User user);
     public void DeleteUser(int userId);
     public void SaveChanges();
+    public UserDTOOut AddUserFromCredentials(UserDtoIn userDtoIn);
+    public User GetUserFromCredentials(LoginDtoIn loginDtoIn);
 }

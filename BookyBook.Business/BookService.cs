@@ -13,16 +13,75 @@ public class BookService : IBookService
     }
     public IEnumerable<Book> GetAllBooks(BookQueryParameters? bookQueryParameters)
     {
-        return _repository.GetAllBooks(bookQueryParameters);
+        
+         var query = _repository.GetAllBooks(bookQueryParameters).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(bookQueryParameters.Title))
+        {
+            query = query.Where(bk => bk.Title.Contains(bookQueryParameters.Title));
+        }
+
+        if (!string.IsNullOrWhiteSpace(bookQueryParameters.Author))
+        {
+            query = query.Where(bk => bk.Author.Contains(bookQueryParameters.Author));
+        }
+
+        if (!string.IsNullOrWhiteSpace(bookQueryParameters.Genre))
+        {
+            query = query.Where(bk => bk.Genre.Contains(bookQueryParameters.Genre));
+        }
+
+        if (bookQueryParameters.fromYear.HasValue && bookQueryParameters.toYear.HasValue)
+        {
+            query = query.Where(bk => bk.Year >= bookQueryParameters.fromYear.Value 
+                                    && bk.Year <= bookQueryParameters.toYear.Value);
+        }
+        else if (bookQueryParameters.fromYear.HasValue)
+        {
+            query = query.Where(bk => bk.Year >= bookQueryParameters.fromYear.Value);
+        }
+        else if (bookQueryParameters.toYear.HasValue)
+        {
+            query = query.Where(bk => bk.Year <= bookQueryParameters.toYear.Value);
+        }
+
+        var result = query.ToList();
+
+        return result;
     }
     public IEnumerable<Borrowing> GetBorrowingsByBookId(int bookId, BookQueryParameters? bookQueryParameters)
     {
-        return _repository.GetBorrowingsByBookId(bookId, bookQueryParameters);
+        
+        var query = _repository.GetBorrowingsByBookId(bookId, bookQueryParameters).AsQueryable();
+
+        if (bookQueryParameters.fromYear.HasValue)
+        {
+            query = query.Where(t => t.BorrowingDate.Value.Year >= bookQueryParameters.fromYear.Value);
+        }
+
+        if (bookQueryParameters.toYear.HasValue)
+        {
+            query = query.Where(t => t.BorrowingDate.Value.Year <= bookQueryParameters.toYear.Value);
+        }
+
+        var result = query.ToList();
+
+        return result;
     }
 
     public Book GetBook(int bookId)
     {
-        return _repository.GetBook(bookId);
+        var book = _repository.GetBook(bookId);
+        if (book == null) throw new ArgumentNullException(nameof(book));
+        return book;
+    }
+
+    public Book AddBook(BookCreateDTO bookCreate)
+    {
+        var book = new Book(bookCreate.Title, bookCreate.Author, bookCreate.Genre, bookCreate.Year, bookCreate.Copies, bookCreate.Score);
+            _repository.AddBook(book);
+            _repository.SaveChanges();
+            return book;
     }
 
     public void UpdateBook(int bookId, BookUpdateDTO bookUpdate)
@@ -42,14 +101,15 @@ public class BookService : IBookService
         _repository.SaveChanges();
     }
 
-    public void AddBook(BookCreateDTO bookCreate)
-    {
-
-    }
-
     public void DeleteBook(int bookId)
     {
+        var book = _repository.GetBook(bookId);
+        if (book == null)
+        {
+            throw new KeyNotFoundException($"Libro {bookId} no encontrado.");
+        }
 
+        _repository.DeleteBook(bookId);
     }
 
 

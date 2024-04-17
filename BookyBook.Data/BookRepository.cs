@@ -19,41 +19,11 @@ public class BookRepository : IBookRepository
 
     public IEnumerable<Book> GetAllBooks(BookQueryParameters? bookQueryParameters)
     {
-
-        var query = _context.Books.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(bookQueryParameters.Title))
-        {
-            query = query.Where(bk => bk.Title.Contains(bookQueryParameters.Title));
+        var books = _context.Books.ToList();
+        if (books is null) {
+            throw new InvalidOperationException("Error al intentar obtener los libros.");
         }
-
-        if (!string.IsNullOrWhiteSpace(bookQueryParameters.Author))
-        {
-            query = query.Where(bk => bk.Author.Contains(bookQueryParameters.Author));
-        }
-
-        if (!string.IsNullOrWhiteSpace(bookQueryParameters.Genre))
-        {
-            query = query.Where(bk => bk.Genre.Contains(bookQueryParameters.Genre));
-        }
-
-        if (bookQueryParameters.fromYear.HasValue && bookQueryParameters.toYear.HasValue)
-        {
-            query = query.Where(bk => bk.Year >= bookQueryParameters.fromYear.Value 
-                                    && bk.Year <= bookQueryParameters.toYear.Value);
-        }
-        else if (bookQueryParameters.fromYear.HasValue)
-        {
-            query = query.Where(bk => bk.Year >= bookQueryParameters.fromYear.Value);
-        }
-        else if (bookQueryParameters.toYear.HasValue)
-        {
-            query = query.Where(bk => bk.Year <= bookQueryParameters.toYear.Value);
-        }
-
-        var result = query.ToList();
-
-        return result;
+        return books;
     }
 
     public IEnumerable<Borrowing> GetBorrowingsByBookId(int bookId, BookQueryParameters? bookQueryParameters)
@@ -65,22 +35,7 @@ public class BookRepository : IBookRepository
         if (book is null) {
             throw new KeyNotFoundException("User not found.");
         }
-
-        var query = book?.Borrowings.AsQueryable();
-
-        if (bookQueryParameters.fromYear.HasValue)
-        {
-            query = query.Where(t => t.BorrowingDate.Value.Year >= bookQueryParameters.fromYear.Value);
-        }
-
-        if (bookQueryParameters.toYear.HasValue)
-        {
-            query = query.Where(t => t.BorrowingDate.Value.Year <= bookQueryParameters.toYear.Value);
-        }
-
-        var result = query.ToList();
-
-        return result;
+        return book.Borrowings;
     }
 
     public Book GetBook(int bookId)

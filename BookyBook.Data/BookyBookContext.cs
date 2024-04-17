@@ -26,8 +26,8 @@ namespace BookyBook.Data
                 .Property(brw => brw.IdNumber)
                 .HasColumnName("Id");
             modelBuilder.Entity<User>().HasData(
-                new User { IdNumber = 1111, Name = "Ignacio", Email = "ignaciocasaus1cns@gmail.com", Password = "patata", PenaltyFee = 0, RegistrationDate = new DateTime(2024,04,04,19,0,0)},
-                new User { IdNumber = 1112, Name = "Alex", Email = "emaildealex@gmail.com", Password = "pimiento", PenaltyFee = 0, RegistrationDate = new DateTime(2024,04,05,18,30,0)}
+                new User { IdNumber = 1111, Name = "Ignacio", Email = "ignaciocasaus1cns@gmail.com", Password = "patata", PenaltyFee = 0, RegistrationDate = new DateTime(2024,04,04,19,0,0), Role = Roles.Admin},
+                new User { IdNumber = 1112, Name = "Alex", Email = "emaildealex@gmail.com", Password = "pimiento", PenaltyFee = 0, RegistrationDate = new DateTime(2024,04,05,18,30,0), Role = Roles.User}
             );
             modelBuilder.Entity<Book>().HasData(
                 new Book {IdNumber = 10001, Title = "the fellowship of the ring", Author = "j. r. r. tolkien", Genre = "fantasy", Year = 1954, Copies = 1, Score = (decimal)8.8},                

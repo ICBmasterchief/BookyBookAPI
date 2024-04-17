@@ -4,7 +4,7 @@ using BookyBook.Models;
 namespace BookyBook.Business;
 public interface IBookService
 {
-    public void AddBook(BookCreateDTO bookCreate);
+    public Book AddBook(BookCreateDTO bookCreate);
     public IEnumerable<Book> GetAllBooks(BookQueryParameters? bookQueryParameters = null);
     public IEnumerable<Borrowing> GetBorrowingsByBookId(int bookId, BookQueryParameters? bookQueryParameters = null);
     public Book GetBook(int bookId);

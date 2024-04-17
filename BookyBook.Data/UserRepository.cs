@@ -21,36 +21,11 @@ public class UserRepository : IUserRepository
 
     public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters)
     {
-
-        var query = _context.Users.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(userQueryParameters.Name))
-        {
-            query = query.Where(usr => usr.Name.Contains(userQueryParameters.Name));
+        var users = _context.Users;
+        if (users is null) {
+            throw new InvalidOperationException("Error al intentar obtener los usuarios.");
         }
-
-        if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))
-        {
-            query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email));
-        }
-
-        if (userQueryParameters.fromDate.HasValue && userQueryParameters.toDate.HasValue)
-        {
-            query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value 
-                                    && usr.RegistrationDate <= userQueryParameters.toDate.Value);
-        }
-        else if (userQueryParameters.fromDate.HasValue)
-        {
-            query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value);
-        }
-        else if (userQueryParameters.toDate.HasValue)
-        {
-            query = query.Where(usr => usr.RegistrationDate <= userQueryParameters.toDate.Value);
-        }
-
-        var result = query.ToList();
-
-        return result;
+        return users;
     }
 
     public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters)
@@ -63,21 +38,7 @@ public class UserRepository : IUserRepository
             throw new KeyNotFoundException("User not found.");
         }
 
-        var query = user?.Borrowings.AsQueryable();
-
-        if (userQueryParameters.fromDate.HasValue)
-        {
-            query = query.Where(t => t.BorrowingDate >= userQueryParameters.fromDate.Value);
-        }
-
-        if (userQueryParameters.toDate.HasValue)
-        {
-            query = query.Where(t => t.BorrowingDate <= userQueryParameters.toDate.Value);
-        }
-
-        var result = query.ToList();
-
-        return result;
+        return user.Borrowings;
     }
 
     public User GetUser(int userId)
@@ -86,6 +47,11 @@ public class UserRepository : IUserRepository
         return user;
     }
 
+    public User GetUserByEmail(string email)
+    {
+        var user = _context.Users.FirstOrDefault(usr => usr.Email == email);
+        return user;
+    }
 
     public void UpdateUser(User user)
     {
@@ -110,7 +76,36 @@ public class UserRepository : IUserRepository
         _context.SaveChanges();
     }
 
+    public UserDTOOut AddUserFromCredentials(UserDtoIn userDtoIn)
+    {
+        var user = new UserDTOOut { UserName = userDtoIn.UserName, Email = userDtoIn.Email, Role = Roles.Guest};
+        if (user == null)
+        {
+            throw new KeyNotFoundException("User not created.");
+        }
+        return user;
+    }
+    
+    public User GetUserFromCredentials(LoginDtoIn loginDtoIn)
+    {
+        var user = _context.Users.FirstOrDefault(usr => usr.Email == loginDtoIn.Email && usr.Password == loginDtoIn.Password);
+        if (user == null)
+        {
+            throw new KeyNotFoundException("User not found.");
+        }
+        return user;
 
+    }
+
+    public bool CheckExistingEmail(User user)
+    {
+        var existingUser = _context.Users.FirstOrDefault(usr => usr.Email == user.Email);
+        if (existingUser == null)
+        {
+            return false;
+        }
+        return true;
+    }
 
     // public List<User>? UsersList = new();
     // private readonly string UserJsonPath;

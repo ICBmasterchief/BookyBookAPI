@@ -31,7 +31,7 @@ public class BookController : ControllerBase
         }     
         catch (Exception ex)
         {
-            _logger.LogInformation(ex.ToString());
+            _logger.LogInformation(ex.Message);
             return BadRequest("No se han encontrado libros");
         }
     }
@@ -47,8 +47,8 @@ public class BookController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogInformation(ex.ToString());
-           return BadRequest("No se han encontrado préstamos");
+            _logger.LogInformation(ex.Message);
+           return BadRequest("No se han encontrado préstamos de ese libro");
         }
     }
 
@@ -60,12 +60,72 @@ public class BookController : ControllerBase
             if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
 
             var book = _bookService.GetBook(bookId);
+
             return Ok(book);
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogInformation(ex.ToString());
-           return NotFound("No encontrado el libro " + bookId);
+            _logger.LogInformation(ex.Message);
+           return NotFound("No se ha encontrado el libro " + bookId);
+        }
+        catch (ArgumentNullException ex)
+        {
+            _logger.LogInformation(ex.Message);
+            return NotFound("No se ha encontrado el libro " + bookId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex.Message);
+            return BadRequest("Error obteniendo el libro " + bookId);
+        }
+    }
+
+    [HttpPost()]
+    public IActionResult CreateBook([FromBody] BookCreateDTO bookCreate)
+    {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+        try {
+            var book = _bookService.AddBook(bookCreate);
+            return Ok(book);
+        }     
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex.Message);
+            return BadRequest("No se ha podido crear el libro");
+        }
+        
+    }
+
+    [HttpPut("{bookId}")]
+    public IActionResult UpdateBook(int bookId, [FromBody] BookUpdateDTO bookUpdate)
+    {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+        try
+        {
+            _bookService.UpdateBook(bookId, bookUpdate);
+            //return NoContent();
+            return Ok(_bookService.GetBook(bookId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogInformation(ex.Message);
+           return NotFound("No se ha podudo actualizar el libro");
+        }
+    }
+
+    [HttpDelete("{bookId}")]
+    public IActionResult DeleteBook(int bookId)
+    {
+        try
+        {
+            _bookService.DeleteBook(bookId);
+            //return NoContent();
+            return Ok(_bookService.GetBook(bookId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogInformation(ex.Message);
+            return NotFound("No se ha podido eliminar el libro");
         }
     }
 }

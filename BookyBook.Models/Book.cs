@@ -2,6 +2,8 @@ namespace BookyBook.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
+
 public class Book
 {
     [Key]
@@ -14,13 +16,14 @@ public class Book
     public string? Genre { get; set; }
     public int? Year { get; set; }
     [Required]
-    public int? Copies { get; set; }
+    public int Copies { get; set; }
     public decimal? Score { get; set; }
+    [JsonIgnore]
     public List<Borrowing> Borrowings { get; set; } = new List<Borrowing>();
     // ELIMINAR? private static int IdNumberSeed = 10001;
 
     public Book(){}
-    public Book(string title, string author, string genre, int year, int copies, decimal score){
+    public Book(string title, string author, string? genre, int? year, int copies, decimal? score){
         this.Title = title;
         this.Author = author;
         this.Genre = genre;
