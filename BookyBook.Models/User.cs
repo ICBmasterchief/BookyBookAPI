@@ -9,17 +9,17 @@ public class User
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int IdNumber { get; set; }
     [Required]
-    public string? Name { get; set; }
+    public string Name { get; set; }
     [Required]
-    public string? Email { get; set; }
+    public string Email { get; set; }
     [Required]
-    public string? Password { get; set; }
-    public DateTime? RegistrationDate { get; set; }
+    public string Password { get; set; }
+    public DateTime RegistrationDate { get; set; }
     public decimal PenaltyFee { get; set; } = 0;
     [JsonIgnore]
     public List<Borrowing> Borrowings { get; set; } = new List<Borrowing>();
     // ELIMINAR? private static int IdNumberSeed = 1111;
-    public string Role { get; set; } = null;
+    public string Role { get; set; } = Roles.User;
 
     public User(){} 
     public User(string name, string email, string password){

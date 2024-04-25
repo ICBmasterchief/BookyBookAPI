@@ -19,23 +19,28 @@ public class UserRepository : IUserRepository
         _context.Users.Add(user);
     }
 
-    public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters)
+    public IEnumerable<User> GetAllUsers()
     {
         var users = _context.Users;
         if (users is null) {
             throw new InvalidOperationException("Error al intentar obtener los usuarios.");
         }
+
         return users;
     }
 
-    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters)
+    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId)
     {
         var user = _context.Users
             .Include(usr => usr.Borrowings) // Incluir prestamos relacionados, pero ojo con referencia circular ;-)
             .FirstOrDefault(usr => usr.IdNumber == userId);
 
-        if (user is null) {
-            throw new KeyNotFoundException("User not found.");
+        var user1 = GetUser(userId);
+
+        if (user1 is null) {
+            throw new KeyNotFoundException("Usuario no encontrado.");
+        } else if (user1.Borrowings is null || user1.Borrowings.Count == 0) {
+            throw new KeyNotFoundException("No se encontraron préstamos.");
         }
 
         return user.Borrowings;
@@ -44,14 +49,18 @@ public class UserRepository : IUserRepository
     public User GetUser(int userId)
     {
         var user = _context.Users.FirstOrDefault(usr => usr.IdNumber == userId);
+        if (user is null) {
+            throw new InvalidOperationException("No se ha encontrado el usuario " + userId);
+        }
+
         return user;
     }
 
-    public User GetUserByEmail(string email)
-    {
-        var user = _context.Users.FirstOrDefault(usr => usr.Email == email);
-        return user;
-    }
+    // public User GetUserByEmail(string email)
+    // {
+    //     var user = _context.Users.FirstOrDefault(usr => usr.Email == email);
+    //     return user;
+    // }
 
     public void UpdateUser(User user)
     {
@@ -63,9 +72,9 @@ public class UserRepository : IUserRepository
 
     public void DeleteUser(int userId) 
     {
-        var user = GetUser(userId);
+        var user = _context.Users.FirstOrDefault(usr => usr.IdNumber == userId);
         if (user is null) {
-            throw new KeyNotFoundException("User not found.");
+            throw new KeyNotFoundException("Usuario no encontrado.");
         }
         _context.Users.Remove(user);
         SaveChanges();
@@ -76,9 +85,9 @@ public class UserRepository : IUserRepository
         _context.SaveChanges();
     }
 
-    public UserDTOOut AddUserFromCredentials(UserDtoIn userDtoIn)
+    public UserLogedDTO AddUserFromCredentials(UserCreateDTO userCreateDTO)
     {
-        var user = new UserDTOOut { UserName = userDtoIn.UserName, Email = userDtoIn.Email, Role = Roles.Guest};
+        var user = new UserLogedDTO { UserName = userCreateDTO.UserName, Email = userCreateDTO.Email, Role = Roles.Guest};
         if (user == null)
         {
             throw new KeyNotFoundException("User not created.");
@@ -86,9 +95,9 @@ public class UserRepository : IUserRepository
         return user;
     }
     
-    public User GetUserFromCredentials(LoginDtoIn loginDtoIn)
+    public User GetUserFromCredentials(LoginDTO loginDTO)
     {
-        var user = _context.Users.FirstOrDefault(usr => usr.Email == loginDtoIn.Email && usr.Password == loginDtoIn.Password);
+        var user = _context.Users.FirstOrDefault(usr => usr.Email == loginDTO.Email && usr.Password == loginDTO.Password);
         if (user == null)
         {
             throw new KeyNotFoundException("User not found.");
@@ -97,9 +106,9 @@ public class UserRepository : IUserRepository
 
     }
 
-    public bool CheckExistingEmail(User user)
+    public bool CheckExistingEmail(string email)
     {
-        var existingUser = _context.Users.FirstOrDefault(usr => usr.Email == user.Email);
+        var existingUser = _context.Users.FirstOrDefault(usr => usr.Email == email);
         if (existingUser == null)
         {
             return false;

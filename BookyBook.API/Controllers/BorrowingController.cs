@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using BookyBook.Data;
 using BookyBook.Business;
 using BookyBook.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("[controller]")]
 public class BorrowingController : ControllerBase
 {
@@ -20,23 +20,25 @@ public class BorrowingController : ControllerBase
         _borrowingService = borrowingService;
     }
 
+    [Authorize(Roles = Roles.Admin)]
     [HttpGet(Name = "GetBorrowings")]
-    public ActionResult<IEnumerable<Borrowing>> GetBorrowings([FromQuery] BorrowingQueryParameters borrowingQueryParameters)
+    public ActionResult<IEnumerable<Borrowing>> GetBorrowings([FromQuery] BorrowingQueryParameters borrowingQueryParameters, [FromQuery] string? sortBy)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
         try 
         {
-            var borrowings = _borrowingService.GetAllBorrowings(borrowingQueryParameters);
+            if (sortBy == null) {sortBy = "";}
+            var borrowings = _borrowingService.GetAllBorrowings(borrowingQueryParameters, sortBy);
             return Ok(borrowings);
         }     
         catch (Exception ex)
         {
-            _logger.LogInformation(ex.Message);
+            _logger.LogInformation(ex.ToString());
             return BadRequest("No se han encontrado libros");
         }
     }
 
-
+    [Authorize(Roles = Roles.Admin)]
     [HttpGet("{borrowingId}", Name = "GetBorrowing")]
     public IActionResult GetBorrowing(int borrowingId)
     {
@@ -49,11 +51,12 @@ public class BorrowingController : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogInformation(ex.Message);
+            _logger.LogInformation(ex.ToString());
            return NotFound("No encontrado el libro " + borrowingId);
         }
     }
 
+    //[Authorize(Roles = Roles.Admin)]
     [HttpPost()]
     public IActionResult CreateBorrowing([FromBody] BorrowingCreateDTO borrowingCreate)
     {
@@ -64,12 +67,13 @@ public class BorrowingController : ControllerBase
         }     
         catch (Exception ex)
         {
-            _logger.LogInformation(ex.Message);
+            _logger.LogInformation(ex.ToString());
             return BadRequest("No se ha podido crear el préstamo");
         }
         
     }
-
+    
+    [Authorize(Roles = Roles.Admin)]
     [HttpPut("{borrowingId}")]
     public IActionResult UpdateBorrowing(int borrowingId, [FromBody] BorrowingUpdateDTO borrowingCreate)
     {
@@ -77,28 +81,27 @@ public class BorrowingController : ControllerBase
         try
         {
             _borrowingService.UpdateBorrowing(borrowingId, borrowingCreate);
-            //return NoContent();
             return Ok(_borrowingService.GetBorrowing(borrowingId));
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogInformation(ex.Message);
+            _logger.LogInformation(ex.ToString());
            return NotFound("No se ha podido actualizar el préstamo");
         }
     }
 
+    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{borrowingId}")]
     public IActionResult DeleteBorrowing(int borrowingId)
     {
         try
         {
             _borrowingService.DeleteBorrowing(borrowingId);
-            //return NoContent();
             return Ok(_borrowingService.GetBorrowing(borrowingId));
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogInformation(ex.Message);
+            _logger.LogInformation(ex.ToString());
             return NotFound("No se ha podido eliminar el préstamo");
         }
     }

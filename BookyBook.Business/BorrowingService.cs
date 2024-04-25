@@ -12,9 +12,9 @@ public class BorrowingService : IBorrowingService
     {
         _repository = repository;
     }
-    public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters)
+    public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters, string? sortBy)
     {
-        var query = _repository.GetAllBorrowings(borrowingQueryParameters).AsQueryable();
+        var query = _repository.GetAllBorrowings().AsQueryable();
 
         if (borrowingQueryParameters.Returned != null)
         {
@@ -58,6 +58,30 @@ public class BorrowingService : IBorrowingService
         else if (string.IsNullOrWhiteSpace(borrowingQueryParameters.toPenaltyFee.ToString()))
         {
             query = query.Where(bw => bw.PenaltyFee <= borrowingQueryParameters.toPenaltyFee);
+        }
+
+        switch (sortBy.ToLower())
+        {
+        case "borrowwingdate":
+            query = query.OrderBy(bw => bw.BorrowingDate);
+            break;
+        case "datetoreturn":
+            query = query.OrderBy(bw => bw.DateToReturn);
+            break;
+        case "returneddate":
+            query = query.OrderBy(bw => bw.ReturnedDate);
+            break;
+        case "penaltyfee":
+            query = query.OrderBy(bw => bw.PenaltyFee);
+            break;
+        case "userid":
+            query = query.OrderBy(bw => bw.UserId);
+            break;
+        case "bookid":
+            query = query.OrderBy(bw => bw.BookId);
+            break;
+        default:
+            break;
         }
 
         var result = query.ToList();

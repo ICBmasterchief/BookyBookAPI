@@ -18,10 +18,10 @@ public class UserQueryParameters
     [DataType(DataType.DateTime, ErrorMessage = "Las fechas de búsqueda tienen que ponerse en este formato: año,mes,dia (2024,04,08)")]
     public DateTime? toDate { get; set; }
 
-    public UserQueryParameters (string? name, string? email)
-    {
-        this.Name = name;
-        this.Email = email;
-    }
+    // public UserQueryParameters (string? name, string? email)
+    // {
+    //     this.Name = name;
+    //     this.Email = email;
+    // }
     
 }

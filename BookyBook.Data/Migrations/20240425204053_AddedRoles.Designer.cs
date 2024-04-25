@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookyBook.Data.Migrations
 {
     [DbContext(typeof(BookyBookContext))]
-    [Migration("20240407120414_firstMigration")]
-    partial class firstMigration
+    [Migration("20240425204053_AddedRoles")]
+    partial class AddedRoles
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,8 +37,7 @@ namespace BookyBook.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Copies")
-                        .IsRequired()
+                    b.Property<int>("Copies")
                         .HasColumnType("int");
 
                     b.Property<string>("Genre")
@@ -62,42 +61,82 @@ namespace BookyBook.Data.Migrations
                         new
                         {
                             IdNumber = 10001,
-                            Author = "j. r. r. tolkien",
+                            Author = "J. R. R. Tolkien",
                             Copies = 1,
-                            Genre = "fantasy",
+                            Genre = "Fantasia",
                             Score = 8.8m,
-                            Title = "the fellowship of the ring",
+                            Title = "La comunidad del anillo",
                             Year = 1954
                         },
                         new
                         {
                             IdNumber = 10002,
-                            Author = "arturo perez reverte",
+                            Author = "Arturo Perez Reverte",
                             Copies = 1,
-                            Genre = "historical novel",
+                            Genre = "Novela historica",
                             Score = 7.44m,
-                            Title = "el capitan alatriste",
+                            Title = "El capitan alatriste",
                             Year = 1996
                         },
                         new
                         {
                             IdNumber = 10003,
-                            Author = "mary shelley",
+                            Author = "Mary Shelley",
                             Copies = 2,
-                            Genre = "gotic novel",
+                            Genre = "Novela gotica",
                             Score = 7.8m,
-                            Title = "frankenstein",
+                            Title = "Frankenstein",
                             Year = 1818
                         },
                         new
                         {
                             IdNumber = 10004,
-                            Author = "j. k. rowling",
+                            Author = "J. K. Rowling",
                             Copies = 1,
-                            Genre = "fantasy",
+                            Genre = "Fantasia",
                             Score = 8m,
-                            Title = "harry potter y la piedra filosofal",
+                            Title = "Harry Potter y la piedra filosofal",
                             Year = 1997
+                        },
+                        new
+                        {
+                            IdNumber = 10005,
+                            Author = "Laura Gallego Garcia",
+                            Copies = 3,
+                            Genre = "Fantasia",
+                            Score = 7.2m,
+                            Title = "El libro de los portales",
+                            Year = 2013
+                        },
+                        new
+                        {
+                            IdNumber = 10006,
+                            Author = "Patrick Rothfuss",
+                            Copies = 4,
+                            Genre = "Fantasia",
+                            Score = 8.1m,
+                            Title = "El nombre del viento",
+                            Year = 2007
+                        },
+                        new
+                        {
+                            IdNumber = 10007,
+                            Author = "John Grisham",
+                            Copies = 2,
+                            Genre = "Thriller",
+                            Score = 7.7m,
+                            Title = "El informe pelicano",
+                            Year = 1992
+                        },
+                        new
+                        {
+                            IdNumber = 10008,
+                            Author = "Stephen King",
+                            Copies = 1,
+                            Genre = "Terror",
+                            Score = 7.9m,
+                            Title = "El resplandor",
+                            Year = 1977
                         });
                 });
 
@@ -171,6 +210,38 @@ namespace BookyBook.Data.Migrations
                             PenaltyFee = 0m,
                             Returned = false,
                             UserId = 1111
+                        },
+                        new
+                        {
+                            IdNumber = 4,
+                            BookId = 10005,
+                            BorrowingDate = new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateToReturn = new DateTime(2024, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PenaltyFee = 0m,
+                            Returned = true,
+                            ReturnedDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 1113
+                        },
+                        new
+                        {
+                            IdNumber = 5,
+                            BookId = 10008,
+                            BorrowingDate = new DateTime(2024, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateToReturn = new DateTime(2024, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PenaltyFee = 10m,
+                            Returned = true,
+                            ReturnedDate = new DateTime(2024, 4, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 1114
+                        },
+                        new
+                        {
+                            IdNumber = 6,
+                            BookId = 10006,
+                            BorrowingDate = new DateTime(2024, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateToReturn = new DateTime(2024, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            PenaltyFee = 0m,
+                            Returned = false,
+                            UserId = 1113
                         });
                 });
 
@@ -198,8 +269,12 @@ namespace BookyBook.Data.Migrations
                     b.Property<decimal>("PenaltyFee")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime?>("RegistrationDate")
+                    b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdNumber");
 
@@ -209,36 +284,62 @@ namespace BookyBook.Data.Migrations
                         new
                         {
                             IdNumber = 1111,
-                            Email = "ignaciocasaus1cns@gmail.com",
-                            Name = "Ignacio",
-                            Password = "patata",
+                            Email = "admin@admin.com",
+                            Name = "Admin",
+                            Password = "admin",
                             PenaltyFee = 0m,
-                            RegistrationDate = new DateTime(2024, 4, 4, 19, 0, 0, 0, DateTimeKind.Unspecified)
+                            RegistrationDate = new DateTime(2024, 4, 3, 17, 0, 0, 0, DateTimeKind.Unspecified),
+                            Role = "admin"
                         },
                         new
                         {
                             IdNumber = 1112,
+                            Email = "ignaciocasaus1cns@gmail.com",
+                            Name = "Ignacio",
+                            Password = "patata",
+                            PenaltyFee = 0m,
+                            RegistrationDate = new DateTime(2024, 4, 4, 19, 0, 0, 0, DateTimeKind.Unspecified),
+                            Role = "user"
+                        },
+                        new
+                        {
+                            IdNumber = 1113,
                             Email = "emaildealex@gmail.com",
                             Name = "Alex",
                             Password = "pimiento",
                             PenaltyFee = 0m,
-                            RegistrationDate = new DateTime(2024, 4, 5, 18, 30, 0, 0, DateTimeKind.Unspecified)
+                            RegistrationDate = new DateTime(2024, 4, 5, 18, 30, 0, 0, DateTimeKind.Unspecified),
+                            Role = "user"
+                        },
+                        new
+                        {
+                            IdNumber = 1114,
+                            Email = "pepe@pepe.com",
+                            Name = "Pepe",
+                            Password = "pepe",
+                            PenaltyFee = 10m,
+                            RegistrationDate = new DateTime(2024, 4, 15, 19, 30, 0, 0, DateTimeKind.Unspecified),
+                            Role = "user"
                         });
                 });
 
             modelBuilder.Entity("BookyBook.Models.Borrowing", b =>
                 {
-                    b.HasOne("BookyBook.Models.Book", null)
+                    b.HasOne("BookyBook.Models.Book", "Book")
                         .WithMany("Borrowings")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BookyBook.Models.User", null)
+                    b.HasOne("BookyBook.Models.User", "User")
                         .WithMany("Borrowings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BookyBook.Models.Book", b =>

@@ -18,7 +18,7 @@ public class BorrowingRepository: IBorrowingRepository
         _context.Borrowings.Add(borrowing);
     }
 
-    public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters)
+    public IEnumerable<Borrowing> GetAllBorrowings()
     {
         var borrowings = _context.Borrowings.ToList();
         if (borrowings is null) {
@@ -30,6 +30,9 @@ public class BorrowingRepository: IBorrowingRepository
     public Borrowing GetBorrowing(int borrowingId)
     {
         var borrowing = _context.Borrowings.FirstOrDefault(bk => bk.IdNumber == borrowingId);
+        if (borrowing is null) {
+            throw new InvalidOperationException("No se ha encontrado el préstamo " + borrowingId);
+        }
         return borrowing;
     }
 
@@ -46,7 +49,7 @@ public class BorrowingRepository: IBorrowingRepository
     {
         var borrowing = GetBorrowing(borrowingId);
         if (borrowing is null) {
-            throw new KeyNotFoundException("Borrowing not found.");
+            throw new KeyNotFoundException("Préstamo no encontrado.");
         }
         _context.Borrowings.Remove(borrowing);
         SaveChanges();

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace BookyBook.Models;
 
-public class UserDTOOut
+public class UserLogedDTO
     {
         [Required]
         public int UserId { get; set; }
@@ -12,7 +12,7 @@ public class UserDTOOut
         [Required]
         public string Email { get; set; }
         [Required]
-        public DateTime? RegistrationDate { get; set; }
+        public DateTime RegistrationDate { get; set; }
         [Required]
         public decimal PenaltyFee { get; set; } = 0;
         [JsonIgnore]

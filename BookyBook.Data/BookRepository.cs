@@ -26,14 +26,16 @@ public class BookRepository : IBookRepository
         return books;
     }
 
-    public IEnumerable<Borrowing> GetBorrowingsByBookId(int bookId, BookQueryParameters? bookQueryParameters)
+    public IEnumerable<Borrowing> GetBorrowingsByBookId(int bookId)
     {
         var book = _context.Books
             .Include(bk => bk.Borrowings) // Incluir prestamos relacionados, pero ojo con referencia circular ;-)
             .FirstOrDefault(bk => bk.IdNumber == bookId);
 
         if (book is null) {
-            throw new KeyNotFoundException("User not found.");
+            throw new KeyNotFoundException("Libro no encontrado.");
+        } else if (book.Borrowings is null) {
+            throw new KeyNotFoundException("No se encontraron préstamos.");
         }
         return book.Borrowings;
     }
@@ -41,6 +43,9 @@ public class BookRepository : IBookRepository
     public Book GetBook(int bookId)
     {
         var book = _context.Books.FirstOrDefault(bk => bk.IdNumber == bookId);
+        if (book is null) {
+            throw new InvalidOperationException("No se ha encontrado el libro " + bookId);
+        }
         return book;
     }
 
@@ -57,7 +62,7 @@ public class BookRepository : IBookRepository
     {
         var book = GetBook(bookId);
         if (book is null) {
-            throw new KeyNotFoundException("Book not found.");
+            throw new KeyNotFoundException("Libro no encontrado.");
         }
         _context.Books.Remove(book);
         SaveChanges();

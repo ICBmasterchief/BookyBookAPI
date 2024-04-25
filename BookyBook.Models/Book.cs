@@ -10,9 +10,9 @@ public class Book
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int IdNumber { get; set; }
     [Required]
-    public string? Title { get; set; }
+    public string Title { get; set; }
     [Required]
-    public string? Author { get; set; }
+    public string Author { get; set; }
     public string? Genre { get; set; }
     public int? Year { get; set; }
     [Required]

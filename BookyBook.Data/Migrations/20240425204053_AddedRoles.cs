@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BookyBook.Data.Migrations
 {
-    public partial class firstMigration : Migration
+    public partial class AddedRoles : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -36,8 +36,9 @@ namespace BookyBook.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PenaltyFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PenaltyFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -80,35 +81,39 @@ namespace BookyBook.Data.Migrations
                 columns: new[] { "Id", "Author", "Copies", "Genre", "Score", "Title", "Year" },
                 values: new object[,]
                 {
-                    { 10001, "j. r. r. tolkien", 1, "fantasy", 8.8m, "the fellowship of the ring", 1954 },
-                    { 10002, "arturo perez reverte", 1, "historical novel", 7.44m, "el capitan alatriste", 1996 },
-                    { 10003, "mary shelley", 2, "gotic novel", 7.8m, "frankenstein", 1818 },
-                    { 10004, "j. k. rowling", 1, "fantasy", 8m, "harry potter y la piedra filosofal", 1997 }
+                    { 10001, "J. R. R. Tolkien", 1, "Fantasia", 8.8m, "La comunidad del anillo", 1954 },
+                    { 10002, "Arturo Perez Reverte", 1, "Novela historica", 7.44m, "El capitan alatriste", 1996 },
+                    { 10003, "Mary Shelley", 2, "Novela gotica", 7.8m, "Frankenstein", 1818 },
+                    { 10004, "J. K. Rowling", 1, "Fantasia", 8m, "Harry Potter y la piedra filosofal", 1997 },
+                    { 10005, "Laura Gallego Garcia", 3, "Fantasia", 7.2m, "El libro de los portales", 2013 },
+                    { 10006, "Patrick Rothfuss", 4, "Fantasia", 8.1m, "El nombre del viento", 2007 },
+                    { 10007, "John Grisham", 2, "Thriller", 7.7m, "El informe pelicano", 1992 },
+                    { 10008, "Stephen King", 1, "Terror", 7.9m, "El resplandor", 1977 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "Email", "Name", "Password", "PenaltyFee", "RegistrationDate" },
+                columns: new[] { "Id", "Email", "Name", "Password", "PenaltyFee", "RegistrationDate", "Role" },
                 values: new object[,]
                 {
-                    { 1111, "ignaciocasaus1cns@gmail.com", "Ignacio", "patata", 0m, new DateTime(2024, 4, 4, 19, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 1112, "emaildealex@gmail.com", "Alex", "pimiento", 0m, new DateTime(2024, 4, 5, 18, 30, 0, 0, DateTimeKind.Unspecified) }
+                    { 1111, "admin@admin.com", "Admin", "admin", 0m, new DateTime(2024, 4, 3, 17, 0, 0, 0, DateTimeKind.Unspecified), "admin" },
+                    { 1112, "ignaciocasaus1cns@gmail.com", "Ignacio", "patata", 0m, new DateTime(2024, 4, 4, 19, 0, 0, 0, DateTimeKind.Unspecified), "user" },
+                    { 1113, "emaildealex@gmail.com", "Alex", "pimiento", 0m, new DateTime(2024, 4, 5, 18, 30, 0, 0, DateTimeKind.Unspecified), "user" },
+                    { 1114, "pepe@pepe.com", "Pepe", "pepe", 10m, new DateTime(2024, 4, 15, 19, 30, 0, 0, DateTimeKind.Unspecified), "user" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Borrowings",
                 columns: new[] { "Id", "BookId", "BorrowingDate", "DateToReturn", "PenaltyFee", "Returned", "ReturnedDate", "UserId" },
-                values: new object[] { 1, 10001, new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 0m, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1111 });
-
-            migrationBuilder.InsertData(
-                table: "Borrowings",
-                columns: new[] { "Id", "BookId", "BorrowingDate", "DateToReturn", "PenaltyFee", "Returned", "ReturnedDate", "UserId" },
-                values: new object[] { 2, 10003, new DateTime(2024, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 3, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), 10m, true, new DateTime(2024, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), 1112 });
-
-            migrationBuilder.InsertData(
-                table: "Borrowings",
-                columns: new[] { "Id", "BookId", "BorrowingDate", "DateToReturn", "PenaltyFee", "Returned", "ReturnedDate", "UserId" },
-                values: new object[] { 3, 10004, new DateTime(2024, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), 0m, false, null, 1111 });
+                values: new object[,]
+                {
+                    { 1, 10001, new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 0m, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1111 },
+                    { 2, 10003, new DateTime(2024, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 3, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), 10m, true, new DateTime(2024, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), 1112 },
+                    { 3, 10004, new DateTime(2024, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), 0m, false, null, 1111 },
+                    { 4, 10005, new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 0m, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1113 },
+                    { 5, 10008, new DateTime(2024, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), 10m, true, new DateTime(2024, 4, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), 1114 },
+                    { 6, 10006, new DateTime(2024, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified), 0m, false, null, 1113 }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Borrowings_BookId",

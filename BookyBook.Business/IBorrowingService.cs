@@ -6,7 +6,7 @@ public interface IBorrowingService
 {
 
     public Borrowing AddBorrowing(BorrowingCreateDTO borrowingCreate);
-    public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters = null);
+    public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters, string? sortBy);
     public Borrowing GetBorrowing(int borrowingId);
     public void UpdateBorrowing(int borrowingId, BorrowingUpdateDTO borrowingUpdate);
     public void DeleteBorrowing(int borrowingId);

@@ -5,6 +5,7 @@ namespace BookyBook.Models;
 
 public class BookUpdateDTO
 { 
+    
     [Required]
     [StringLength(100, ErrorMessage = "El título del libro debe tener menos de 100 caracteres")]
     public string? Title { get; set; }

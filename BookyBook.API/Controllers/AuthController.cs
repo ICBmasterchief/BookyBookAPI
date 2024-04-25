@@ -1,60 +1,61 @@
 using Microsoft.AspNetCore.Mvc;
-using BookyBook.Models;
 using BookyBook.Business;
+using BookyBook.Models;
 
-namespace BankApp.API.Controllers;
+namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-    public class AuthController : ControllerBase
+public class AuthController : ControllerBase
+{
+    
+    private readonly ILogger<AuthController> _logger;
+    private readonly IUserService _userService;
+
+    public AuthController(ILogger<AuthController> logger, IUserService userService)
     {
-        private readonly ILogger<AuthController> _logger;
-        private readonly IUserService _userService;
-
-        public AuthController(ILogger<AuthController> logger, IUserService userService)
-        {
-            _logger = logger;
-            _userService = userService;
-        }
-
-        [HttpPost]
-        public IActionResult Login(LoginDtoIn loginDtoIn)
-        {
-            try
-            {
-                if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
-
-                var token = _userService.Login(loginDtoIn);
-                return Ok(token);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return Unauthorized(ex.Message);
-                
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest("Error generating the token");
-            }
-        }
-
-        [HttpPost]
-        public IActionResult Register(UserDtoIn userDtoIn)
-        {
-            try
-            {
-                if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
-
-                var token = _userService.AddUser(userDtoIn);
-                return Ok(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-                return BadRequest("Error generating the token");
-            }
-        }
-
+        _logger = logger;
+        _userService = userService;
     }
+
+    [HttpPost("Login")]
+    public ActionResult<string> Login([FromBody] LoginDTO loginDTO)
+    {
+        try
+        {
+            if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+
+            var token = _userService.Login(loginDTO);
+            return Ok(token);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogInformation(ex.ToString());
+            return Unauthorized(ex.Message);
+            
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex.ToString());
+            return BadRequest("Error generating the token");
+        }
+    }
+
+    [HttpPost("Register")]
+    public IActionResult Register([FromBody] UserCreateDTO userCreateDTO)
+    {
+        try
+        {
+            if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+
+            var token = _userService.AddUser(userCreateDTO);
+            return Ok(token);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex.ToString());
+            return BadRequest("Error generating the token");
+        }
+    }
+
+}

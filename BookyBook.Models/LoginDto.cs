@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BookyBook.Models;
 
-public class LoginDtoIn
+public class LoginDTO
     {
         [EmailAddress]
         [Required(ErrorMessage = "Email is required")]

@@ -5,10 +5,11 @@ namespace BookyBook.Business;
 public interface IBookService
 {
     public Book AddBook(BookCreateDTO bookCreate);
-    public IEnumerable<Book> GetAllBooks(BookQueryParameters? bookQueryParameters = null);
-    public IEnumerable<Borrowing> GetBorrowingsByBookId(int bookId, BookQueryParameters? bookQueryParameters = null);
-    public Book GetBook(int bookId);
+    public IEnumerable<BookDTO> GetAllBooks(BookQueryParameters? bookQueryParameters, string? sortBy);
+    public IEnumerable<Borrowing> GetBorrowingsByBookId(int bookId, BookQueryParameters? bookQueryParameters, string? sortBy);
+    public BookDTO GetBook(int bookId);
     public void UpdateBook(int bookId, BookUpdateDTO bookUpdate);
+    public void UpdateCopiesOfBook(int bookId, BookAddCopiesDTO bookAddCopies);
     public void DeleteBook(int bookId);
 
     // public void SearchForBooks();

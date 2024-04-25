@@ -5,14 +5,14 @@ using System.Security.Claims;
 namespace BookyBook.Business;
 public interface IUserService
 {
-    public string AddUser(UserDtoIn userDTOIn);
-    public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters = null);
-    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters = null);
-    public User GetUser(int userId);
+    public string AddUser(UserCreateDTO userCreateDTO);
+    public IEnumerable<UserLogedDTO> GetAllUsers(UserQueryParameters? userQueryParameters, string? sortBy);
+    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters, string? sortBy);
+    public UserLogedDTO GetUser(int userId);
     public void UpdateUser(int userId, UserUpdateDTO userUpdate);
     public void DeleteUser(int userId);
-    public string Login(LoginDtoIn userDtoIn);
-    public string GenerateToken(UserDTOOut userDTOOut);
+    public string Login(LoginDTO loginDTO);
+    public string GenerateToken(UserLogedDTO userLogedDTO);
     public bool HasAccessToResource(int requestedUserID, ClaimsPrincipal user);
 
     // public bool CheckExistingUserData(string? email, string? password, bool loggIn=false);

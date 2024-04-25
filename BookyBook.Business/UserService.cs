@@ -20,13 +20,25 @@ public class UserService : IUserService
         _configuration = configuration;
         _repository = repository;
     }
-    public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters)
+    public IEnumerable<UserLogedDTO> GetAllUsers(UserQueryParameters? userQueryParameters, string? sortBy)
     {
-        var query = _repository.GetAllUsers(userQueryParameters).AsQueryable();
+        var users = _repository.GetAllUsers();
+
+        var usersDTO = users.Select(u => new UserLogedDTO
+        {
+            UserId = u.IdNumber,
+            UserName = u.Name,
+            Email = u.Email,
+            RegistrationDate = u.RegistrationDate,
+            PenaltyFee = u.PenaltyFee,
+            Role = u.Role,
+        }).ToList();
+
+        var query = usersDTO.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(userQueryParameters.Name))
         {
-            query = query.Where(usr => usr.Name.Contains(userQueryParameters.Name));
+            query = query.Where(usr => usr.UserName.Contains(userQueryParameters.Name));
         }
 
         if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))
@@ -48,13 +60,26 @@ public class UserService : IUserService
             query = query.Where(usr => usr.RegistrationDate <= userQueryParameters.toDate.Value);
         }
 
+
+        switch (sortBy.ToLower())
+        {
+        case "registrationdate":
+            query = query.OrderBy(usr => usr.RegistrationDate);
+            break;
+        case "penaltyfee":
+            query = query.OrderBy(usr => usr.PenaltyFee);
+            break;
+        default:
+            break;
+        }
+
         var result = query.ToList();
 
         return result;
     }
-    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters)
+    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters, string? sortBy)
     {
-        var query = _repository.GetBorrowingsByUserId(userId, userQueryParameters).AsQueryable();
+        var query = _repository.GetBorrowingsByUserId(userId).AsQueryable();
 
         if (userQueryParameters.fromDate.HasValue)
         {
@@ -66,37 +91,67 @@ public class UserService : IUserService
             query = query.Where(t => t.BorrowingDate <= userQueryParameters.toDate.Value);
         }
 
+
+        switch (sortBy.ToLower())
+        {
+        case "borrowwingdate":
+            query = query.OrderBy(bw => bw.BorrowingDate);
+            break;
+        case "datetoreturn":
+            query = query.OrderBy(bw => bw.DateToReturn);
+            break;
+        case "returneddate":
+            query = query.OrderBy(bw => bw.ReturnedDate);
+            break;
+        case "penaltyfee":
+            query = query.OrderBy(bw => bw.PenaltyFee);
+            break;
+        case "userid":
+            query = query.OrderBy(bw => bw.UserId);
+            break;
+        case "bookid":
+            query = query.OrderBy(bw => bw.BookId);
+            break;
+        default:
+            break;
+        }
+
         var result = query.ToList();
 
         return result;
     }
 
-    public User GetUser(int userId)
+    public UserLogedDTO GetUser(int userId)
     {
-        return _repository.GetUser(userId);
+        var user = _repository.GetUser(userId);
+        var userDTO = new UserLogedDTO
+        {
+            UserId = user.IdNumber,
+            UserName = user.Name,
+            Email = user.Email,
+            RegistrationDate = user.RegistrationDate,
+            PenaltyFee = user.PenaltyFee,
+            Role = user.Role,
+        };
+        return userDTO;
     }
 
-    public string AddUser(UserDtoIn userDTOIn)
+    public string AddUser(UserCreateDTO userCreateDTO)
     {   
-        var parameter = new UserQueryParameters (userDTOIn.UserName, userDTOIn.Email);
-        if (GetAllUsers(parameter) != null)
+        if (_repository.CheckExistingEmail(userCreateDTO.Email))
         {
-          throw new KeyNotFoundException($"El email {userDTOIn.Email} ya existe");   
+          throw new KeyNotFoundException($"El email {userCreateDTO.Email} ya existe");   
         }
-        var user = new User(userDTOIn.UserName, userDTOIn.Email, userDTOIn.Password);
+        var user = new User(userCreateDTO.UserName, userCreateDTO.Email, userCreateDTO.Password);
         _repository.AddUser(user);
         _repository.SaveChanges();
-        var newUser = _repository.AddUserFromCredentials(userDTOIn);
+        var newUser = _repository.AddUserFromCredentials(userCreateDTO);
         return GenerateToken(newUser);
     }
 
     public void UpdateUser(int userId, UserUpdateDTO userUpdate)
     {
         var user = _repository.GetUser(userId);
-        if (user == null)
-        {
-            throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
-        }
 
         user.Name = userUpdate.Name;
         user.Password = userUpdate.Password;
@@ -117,17 +172,17 @@ public class UserService : IUserService
     }
 
     
-    public string Login(LoginDtoIn loginDtoIn) {
-        var user = _repository.GetUserFromCredentials(loginDtoIn);
+    public string Login(LoginDTO loginDTO) {
+        var user = _repository.GetUserFromCredentials(loginDTO);
         if (user.Email == "ignaciocasaus1cns@gmail.com")
         {
             user.Role = Roles.Admin;
         }
-        var userLogin = new UserDTOOut {UserId = user.IdNumber, UserName = user.Name, Email = user.Email, RegistrationDate = user.RegistrationDate, PenaltyFee = user.PenaltyFee, Borrowings = user.Borrowings, Role = user.Role};
+        var userLogin = new UserLogedDTO {UserId = user.IdNumber, UserName = user.Name, Email = user.Email, RegistrationDate = user.RegistrationDate, PenaltyFee = user.PenaltyFee, Borrowings = user.Borrowings, Role = user.Role};
         return GenerateToken(userLogin);
     }
 
-    public string GenerateToken(UserDTOOut userDTOOut) {
+    public string GenerateToken(UserLogedDTO userLogedDTO) {
         var key = Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]); 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -135,10 +190,10 @@ public class UserService : IUserService
             Audience = _configuration["JWT:ValidAudience"],
             Subject = new ClaimsIdentity(new Claim[] 
                 {
-                    new Claim(ClaimTypes.NameIdentifier, Convert.ToString(userDTOOut.UserId)),
-                    new Claim(ClaimTypes.Name, userDTOOut.UserName),
-                    new Claim(ClaimTypes.Role, userDTOOut.Role),
-                    new Claim(ClaimTypes.Email, userDTOOut.Email),
+                    new Claim(ClaimTypes.NameIdentifier, Convert.ToString(userLogedDTO.UserId)),
+                    new Claim(ClaimTypes.Name, userLogedDTO.UserName),
+                    new Claim(ClaimTypes.Role, userLogedDTO.Role),
+                    new Claim(ClaimTypes.Email, userLogedDTO.Email),
                     new Claim("myCustomClaim", "myCustomClaimValue"),
                     // add other claims
                 }),
@@ -161,7 +216,7 @@ public class UserService : IUserService
         var isOwnResource = userId == requestedUserID;
 
         var roleClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-        if (roleClaim != null) return false;
+        if (roleClaim == null) return false;
         var isAdmin = roleClaim!.Value == Roles.Admin;
         
         var hasAccess = isOwnResource || isAdmin;
