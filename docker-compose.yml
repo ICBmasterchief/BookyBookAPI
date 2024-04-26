@@ -22,17 +22,19 @@ services:
             timeout: 10s
             retries: 3
 
-    # api:
-    #     restart: unless-stopped 
-    #     ports:
-    #         - 7790:80 
-    #     build: 
-    #       context: .
-    #       dockerfile: Dockerfile
-    #     depends_on:
-    #         - db
-    #     networks:
-    #         - bookybook
+    api:
+        restart: unless-stopped 
+        ports:
+            - 7790:80 
+        build: 
+          context: .
+          dockerfile: Dockerfile
+        depends_on:
+            - db
+        networks:
+            - bookybook
+        volumes:
+            - logs:/app/Logs
 
 
    # web:
@@ -45,3 +47,9 @@ services:
 
 volumes:
     db-data: {}
+    logs:
+      driver: local 
+      driver_opts:
+        type: none
+        device: ./Logs
+        o: bind

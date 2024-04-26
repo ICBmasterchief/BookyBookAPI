@@ -13,11 +13,13 @@ public class UserController : ControllerBase
 
     private readonly ILogger<UserController> _logger;
     private readonly IUserService _userService;
+    private readonly IAuthService _authService;
 
-    public UserController(ILogger<UserController> logger, IUserService userService)
+    public UserController(ILogger<UserController> logger, IUserService userService, IAuthService authService)
     {
         _logger = logger;
         _userService = userService;
+        _authService = authService;
     }
 
     [Authorize(Roles = Roles.Admin)]
@@ -43,7 +45,7 @@ public class UserController : ControllerBase
     public IActionResult GetBorrowingsByUserId(int userId, [FromQuery] UserQueryParameters userQueryParameters, [FromQuery] string? sortBy)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
-        if (!_userService.HasAccessToResource(userId, HttpContext.User)) 
+        if (!_authService.HasAccessToResource(userId, HttpContext.User)) 
             {return Forbid(); }
         try
         {
@@ -82,7 +84,7 @@ public class UserController : ControllerBase
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try {
-            _userService.AddUser(userCreateDTO);
+            _authService.AddUser(userCreateDTO);
             return Ok(userCreateDTO);
         }     
         catch (Exception ex)
@@ -97,7 +99,7 @@ public class UserController : ControllerBase
     public IActionResult UpdateUser(int userId, [FromBody] UserUpdateDTO userUpdate)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); }
-        if (!_userService.HasAccessToResource(userId, HttpContext.User)) 
+        if (!_authService.HasAccessToResource(userId, HttpContext.User)) 
             {return Forbid(); }
         try
         {
@@ -114,7 +116,7 @@ public class UserController : ControllerBase
     [HttpDelete("{userId}")]
     public IActionResult DeleteUser(int userId)
     {
-        if (!_userService.HasAccessToResource(userId, HttpContext.User)) 
+        if (!_authService.HasAccessToResource(userId, HttpContext.User)) 
             {return Forbid(); }
         try
         {

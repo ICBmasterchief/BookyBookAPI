@@ -22,7 +22,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
@@ -31,7 +31,7 @@ builder.Services.AddScoped<IBorrowingService, BorrowingService>();
 builder.Services.AddScoped<IBorrowingRepository, BorrowingRepository>();
 
 // Obteniendo la cadena de conexión desde appsettings.json
-var connectionString = builder.Configuration.GetConnectionString("ServerDB_localhost");
+var connectionString = builder.Configuration.GetConnectionString("ServerDB_dockernet");
 
 builder.Services.AddDbContext<BookyBookContext>(options =>
     options.UseSqlServer(connectionString)
@@ -82,6 +82,9 @@ builder.Services.AddCors(options =>
 
 
 var app = builder.Build();
+
+var loggerFactory = app.Services.GetService<ILoggerFactory>();
+loggerFactory.AddFile(builder.Configuration["Logging:LogFilePath"].ToString());
 
 //Añade migraciones automáticamente
 using (var scope = app.Services.CreateScope())

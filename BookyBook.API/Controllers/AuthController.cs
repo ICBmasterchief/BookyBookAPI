@@ -10,12 +10,12 @@ public class AuthController : ControllerBase
 {
     
     private readonly ILogger<AuthController> _logger;
-    private readonly IUserService _userService;
+    private readonly IAuthService _authService;
 
-    public AuthController(ILogger<AuthController> logger, IUserService userService)
+    public AuthController(ILogger<AuthController> logger, IAuthService authService)
     {
         _logger = logger;
-        _userService = userService;
+        _authService = authService;
     }
 
     [HttpPost("Login")]
@@ -25,7 +25,7 @@ public class AuthController : ControllerBase
         {
             if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
 
-            var token = _userService.Login(loginDTO);
+            var token = _authService.Login(loginDTO);
             return Ok(token);
         }
         catch (KeyNotFoundException ex)
@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
         {
             if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
 
-            var token = _userService.AddUser(userCreateDTO);
+            var token = _authService.AddUser(userCreateDTO);
             return Ok(token);
         }
         catch (Exception ex)

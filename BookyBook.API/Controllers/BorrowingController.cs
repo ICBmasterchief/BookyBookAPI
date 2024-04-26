@@ -13,11 +13,13 @@ public class BorrowingController : ControllerBase
 
     private readonly ILogger<BorrowingController> _logger;
     private readonly IBorrowingService _borrowingService;
+    private readonly IAuthService _authService;
 
-    public BorrowingController(ILogger<BorrowingController> logger, IBorrowingService borrowingService)
+    public BorrowingController(ILogger<BorrowingController> logger, IBorrowingService borrowingService, IAuthService authService)
     {
         _logger = logger;
         _borrowingService = borrowingService;
+        _authService = authService;
     }
 
     [Authorize(Roles = Roles.Admin)]
@@ -73,13 +75,16 @@ public class BorrowingController : ControllerBase
         
     }
     
-    [Authorize(Roles = Roles.Admin)]
+    //[Authorize(Roles = Roles.Admin)]
     [HttpPut("{borrowingId}")]
     public IActionResult UpdateBorrowing(int borrowingId, [FromBody] BorrowingUpdateDTO borrowingCreate)
     {
-        if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try
         {
+            var borrowing = _borrowingService.GetBorrowing(borrowingId);
+            if (!_authService.HasAccessToResource(borrowing.UserId, HttpContext.User)) 
+            {return Forbid(); }
             _borrowingService.UpdateBorrowing(borrowingId, borrowingCreate);
             return Ok(_borrowingService.GetBorrowing(borrowingId));
         }
