@@ -5,6 +5,183 @@ using BookyBook.Models;
 namespace BookyBook.Business;
 public class BookService : IBookService
 {
+
+    private readonly IBookRepository _repository;
+    public BookService(IBookRepository repository)
+    {
+        _repository = repository;
+    }
+    public IEnumerable<BookDTO> GetAllBooks(BookQueryParameters? bookQueryParameters, string? sortBy)
+    {
+
+        var books = _repository.GetAllBooks();
+
+        var booksDTO = books.Select(b => new BookDTO
+        {
+            BookId = b.IdNumber,
+            Title = b.Title,
+            Author = b.Author,
+            Genre = b.Genre,
+            Year = b.Year,
+            Copies = b.Copies,
+            Score = b.Score,
+        }).ToList();
+        
+         var query = booksDTO.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(bookQueryParameters.Title))
+        {
+            query = query.Where(bk => bk.Title.Contains(bookQueryParameters.Title));
+        }
+
+        if (!string.IsNullOrWhiteSpace(bookQueryParameters.Author))
+        {
+            query = query.Where(bk => bk.Author.Contains(bookQueryParameters.Author));
+        }
+
+        if (!string.IsNullOrWhiteSpace(bookQueryParameters.Genre))
+        {
+            query = query.Where(bk => bk.Genre.Contains(bookQueryParameters.Genre));
+        }
+
+        if (bookQueryParameters.fromYear.HasValue && bookQueryParameters.toYear.HasValue)
+        {
+            query = query.Where(bk => bk.Year >= bookQueryParameters.fromYear.Value 
+                                    && bk.Year <= bookQueryParameters.toYear.Value);
+        }
+        else if (bookQueryParameters.fromYear.HasValue)
+        {
+            query = query.Where(bk => bk.Year >= bookQueryParameters.fromYear.Value);
+        }
+        else if (bookQueryParameters.toYear.HasValue)
+        {
+            query = query.Where(bk => bk.Year <= bookQueryParameters.toYear.Value);
+        }
+
+
+        switch (sortBy.ToLower())
+        {
+        case "year":
+            query = query.OrderBy(bk => bk.Year);
+            break;
+        case "copies":
+            query = query.OrderBy(bk => bk.Copies);
+            break;
+        case "score":
+            query = query.OrderBy(bk => bk.Score);
+            break;
+        default:
+            break;
+        }
+
+        var result = query.ToList();
+
+        return result;
+    }
+    public IEnumerable<Borrowing> GetBorrowingsByBookId(int bookId, BookQueryParameters? bookQueryParameters, string? sortBy)
+    {
+        
+        var query = _repository.GetBorrowingsByBookId(bookId).AsQueryable();
+
+        if (bookQueryParameters.fromYear.HasValue)
+        {
+            query = query.Where(t => t.BorrowingDate.Value.Year >= bookQueryParameters.fromYear.Value);
+        }
+
+        if (bookQueryParameters.toYear.HasValue)
+        {
+            query = query.Where(t => t.BorrowingDate.Value.Year <= bookQueryParameters.toYear.Value);
+        }
+
+
+        switch (sortBy.ToLower())
+        {
+        case "borrowwingdate":
+            query = query.OrderBy(bw => bw.BorrowingDate);
+            break;
+        case "datetoreturn":
+            query = query.OrderBy(bw => bw.DateToReturn);
+            break;
+        case "returneddate":
+            query = query.OrderBy(bw => bw.ReturnedDate);
+            break;
+        case "penaltyfee":
+            query = query.OrderBy(bw => bw.PenaltyFee);
+            break;
+        case "userid":
+            query = query.OrderBy(bw => bw.UserId);
+            break;
+        case "bookid":
+            query = query.OrderBy(bw => bw.BookId);
+            break;
+        default:
+            break;
+        }
+
+        var result = query.ToList();
+
+        return result;
+    }
+
+    public BookDTO GetBook(int bookId)
+    {
+        var book = _repository.GetBook(bookId);
+        var bookDTO = new BookDTO
+        {
+            BookId = book.IdNumber,
+            Title = book.Title,
+            Author = book.Author,
+            Genre = book.Genre,
+            Year = book.Year,
+            Copies = book.Copies,
+            Score = book.Score,
+        };
+        return bookDTO;
+    }
+
+    public Book AddBook(BookCreateDTO bookCreate)
+    {
+        var book = new Book(bookCreate.Title, bookCreate.Author, bookCreate.Genre, bookCreate.Year, bookCreate.Copies, bookCreate.Score);
+            _repository.AddBook(book);
+            _repository.SaveChanges();
+            return book;
+    }
+
+    public void UpdateBook(int bookId, BookUpdateDTO bookUpdate)
+    {
+        var book = _repository.GetBook(bookId);
+
+        book.Title = bookUpdate.Title;
+        book.Author = bookUpdate.Author;
+        book.Genre = bookUpdate.Genre;
+        book.Year = bookUpdate.Year;
+        book.Score = bookUpdate.Score;
+        _repository.UpdateBook(book);
+        _repository.SaveChanges();
+    }
+
+    public void UpdateCopiesOfBook(int bookId, BookAddCopiesDTO bookAddCopies)
+    {
+        var book = _repository.GetBook(bookId);
+
+        book.Copies += bookAddCopies.Copies;
+        _repository.UpdateBook(book);
+        _repository.SaveChanges();
+    }
+
+    public void DeleteBook(int bookId)
+    {
+        var book = _repository.GetBook(bookId);
+        if (book == null)
+        {
+            throw new KeyNotFoundException($"Libro {bookId} no encontrado.");
+        }
+
+        _repository.DeleteBook(bookId);
+    }
+
+
+
     // public readonly BookRepository bookData = new();
     // public Table BookTable = new();
     // private int existingBookIndex;

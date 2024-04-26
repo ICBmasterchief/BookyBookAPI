@@ -3,20 +3,160 @@ using System.Runtime.CompilerServices;
 using BookyBook.Data;
 using BookyBook.Models;
 //using Spectre.Console;
-using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace BookyBook.Business;
 public class UserService : IUserService
 {
-    public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters)
+    private readonly IConfiguration _configuration;
+    private readonly IUserRepository _repository;
+
+    public UserService(IConfiguration configuration, IUserRepository repository)
     {
-        return new List<User>();
+        _configuration = configuration;
+        _repository = repository;
+    }
+    public IEnumerable<UserLogedDTO> GetAllUsers(UserQueryParameters? userQueryParameters, string? sortBy)
+    {
+        var users = _repository.GetAllUsers();
+
+        var usersDTO = users.Select(u => new UserLogedDTO
+        {
+            UserId = u.IdNumber,
+            UserName = u.Name,
+            Email = u.Email,
+            RegistrationDate = u.RegistrationDate,
+            PenaltyFee = u.PenaltyFee,
+            Role = u.Role,
+        }).ToList();
+
+        var query = usersDTO.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(userQueryParameters.Name))
+        {
+            query = query.Where(usr => usr.UserName.Contains(userQueryParameters.Name));
+        }
+
+        if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))
+        {
+            query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email));
+        }
+
+        if (userQueryParameters.fromDate.HasValue && userQueryParameters.toDate.HasValue)
+        {
+            query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value 
+                                    && usr.RegistrationDate <= userQueryParameters.toDate.Value);
+        }
+        else if (userQueryParameters.fromDate.HasValue)
+        {
+            query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value);
+        }
+        else if (userQueryParameters.toDate.HasValue)
+        {
+            query = query.Where(usr => usr.RegistrationDate <= userQueryParameters.toDate.Value);
+        }
+
+
+        switch (sortBy.ToLower())
+        {
+        case "registrationdate":
+            query = query.OrderBy(usr => usr.RegistrationDate);
+            break;
+        case "penaltyfee":
+            query = query.OrderBy(usr => usr.PenaltyFee);
+            break;
+        default:
+            break;
+        }
+
+        var result = query.ToList();
+
+        return result;
+    }
+    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId, UserQueryParameters? userQueryParameters, string? sortBy)
+    {
+        var query = _repository.GetBorrowingsByUserId(userId).AsQueryable();
+
+        if (userQueryParameters.fromDate.HasValue)
+        {
+            query = query.Where(t => t.BorrowingDate >= userQueryParameters.fromDate.Value);
+        }
+
+        if (userQueryParameters.toDate.HasValue)
+        {
+            query = query.Where(t => t.BorrowingDate <= userQueryParameters.toDate.Value);
+        }
+
+
+        switch (sortBy.ToLower())
+        {
+        case "borrowwingdate":
+            query = query.OrderBy(bw => bw.BorrowingDate);
+            break;
+        case "datetoreturn":
+            query = query.OrderBy(bw => bw.DateToReturn);
+            break;
+        case "returneddate":
+            query = query.OrderBy(bw => bw.ReturnedDate);
+            break;
+        case "penaltyfee":
+            query = query.OrderBy(bw => bw.PenaltyFee);
+            break;
+        case "userid":
+            query = query.OrderBy(bw => bw.UserId);
+            break;
+        case "bookid":
+            query = query.OrderBy(bw => bw.BookId);
+            break;
+        default:
+            break;
+        }
+
+        var result = query.ToList();
+
+        return result;
     }
 
+    public UserLogedDTO GetUser(int userId)
+    {
+        var user = _repository.GetUser(userId);
+        var userDTO = new UserLogedDTO
+        {
+            UserId = user.IdNumber,
+            UserName = user.Name,
+            Email = user.Email,
+            RegistrationDate = user.RegistrationDate,
+            PenaltyFee = user.PenaltyFee,
+            Role = user.Role,
+        };
+        return userDTO;
+    }
 
+    public void UpdateUser(int userId, UserUpdateDTO userUpdate)
+    {
+        var user = _repository.GetUser(userId);
 
+        user.Name = userUpdate.Name;
+        user.Password = userUpdate.Password;
+        _repository.UpdateUser(user);
+        _repository.SaveChanges();
+    }
 
+    public void DeleteUser(int userId)
+    {
+        var user = _repository.GetUser(userId);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
+        }
+
+        _repository.DeleteUser(userId);
+
+    }
 
 
 
@@ -87,7 +227,7 @@ public class UserService : IUserService
     //                 userData.AddUser(user);
     //                 AnsiConsole.MarkupLine("[yellow]User created succesfully![/]");
     //         }
-            
+
     //     } else {
     //         AnsiConsole.MarkupLine("[yellow]ERROR: Passwords do not match.[/]");
     //     }

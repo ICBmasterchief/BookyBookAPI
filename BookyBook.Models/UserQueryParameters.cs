@@ -4,6 +4,7 @@ namespace BookyBook.Models;
 
 public class UserQueryParameters
 {
+
     [StringLength(100, ErrorMessage = "El nombre de Usuario debe tener menos de 100 caracteres")]
     public string? Name { get; set; }
 
@@ -11,9 +12,16 @@ public class UserQueryParameters
     [StringLength(100, ErrorMessage = "El email del usuario debe tener menos de 100 caracteres")]
     public string? Email { get; set; }
 
-    // [Range(double.MinValue, double.MaxValue, ErrorMessage = "El balance debe estar en rango válido.")]
-    // public decimal? Balance { get; set; }
-
+    [DataType(DataType.DateTime, ErrorMessage = "Las fechas de búsqueda tienen que ponerse en este formato: año,mes,dia (2024,04,08)")]
     public DateTime? fromDate { get; set; }
+
+    [DataType(DataType.DateTime, ErrorMessage = "Las fechas de búsqueda tienen que ponerse en este formato: año,mes,dia (2024,04,08)")]
     public DateTime? toDate { get; set; }
+
+    // public UserQueryParameters (string? name, string? email)
+    // {
+    //     this.Name = name;
+    //     this.Email = email;
+    // }
+    
 }

@@ -9,80 +9,112 @@ public class UserRepository : IUserRepository
 
     private readonly BookyBookContext _context;
 
-        public UserRepository(BookyBookContext context)
+    public UserRepository(BookyBookContext context)
+    {
+        _context = context;
+    }
+
+    public void AddUser(User user)
+    {
+        _context.Users.Add(user);
+    }
+
+    public IEnumerable<User> GetAllUsers()
+    {
+        var users = _context.Users;
+        if (users is null) {
+            throw new InvalidOperationException("Error al intentar obtener los usuarios.");
+        }
+
+        return users;
+    }
+
+    public IEnumerable<Borrowing> GetBorrowingsByUserId(int userId)
+    {
+        var user = _context.Users
+            .Include(usr => usr.Borrowings) // Incluir prestamos relacionados, pero ojo con referencia circular ;-)
+            .FirstOrDefault(usr => usr.IdNumber == userId);
+
+        var user1 = GetUser(userId);
+
+        if (user1 is null) {
+            throw new KeyNotFoundException("Usuario no encontrado.");
+        } else if (user1.Borrowings is null || user1.Borrowings.Count == 0) {
+            throw new KeyNotFoundException("No se encontraron préstamos.");
+        }
+
+        return user.Borrowings;
+    }
+
+    public User GetUser(int userId)
+    {
+        var user = _context.Users.FirstOrDefault(usr => usr.IdNumber == userId);
+        if (user is null) {
+            throw new InvalidOperationException("No se ha encontrado el usuario " + userId);
+        }
+
+        return user;
+    }
+
+    // public User GetUserByEmail(string email)
+    // {
+    //     var user = _context.Users.FirstOrDefault(usr => usr.Email == email);
+    //     return user;
+    // }
+
+    public void UpdateUser(User user)
+    {
+        // En EF Core, si el objeto ya está siendo rastreado, actualizar sus propiedades
+        // y llamar a SaveChanges() es suficiente para actualizarlo en la base de datos.
+        // Asegúrate de que el estado del objeto sea 'Modified' si es necesario.
+        _context.Entry(user).State = EntityState.Modified;
+    }
+
+    public void DeleteUser(int userId) 
+    {
+        var user = _context.Users.FirstOrDefault(usr => usr.IdNumber == userId);
+        if (user is null) {
+            throw new KeyNotFoundException("Usuario no encontrado.");
+        }
+        _context.Users.Remove(user);
+        SaveChanges();
+    }
+    
+    public void SaveChanges()
+    {
+        _context.SaveChanges();
+    }
+
+    public UserLogedDTO AddUserFromCredentials(UserCreateDTO userCreateDTO)
+    {
+        var user = new UserLogedDTO { UserName = userCreateDTO.UserName, Email = userCreateDTO.Email, Role = Roles.Guest};
+        if (user == null)
         {
-            _context = context;
+            throw new KeyNotFoundException("User not created.");
         }
-
-        public void AddUser(User user)
+        return user;
+    }
+    
+    public User GetUserFromCredentials(LoginDTO loginDTO)
+    {
+        var user = _context.Users.FirstOrDefault(usr => usr.Email == loginDTO.Email && usr.Password == loginDTO.Password);
+        if (user == null)
         {
-            _context.Users.Add(user);
+            throw new KeyNotFoundException("User not found.");
         }
+        return user;
 
-         public IEnumerable<User> GetAllUsers(UserQueryParameters? userQueryParameters) {
+    }
 
-            var query = _context.Users.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(userQueryParameters.Name))
-            {
-                query = query.Where(usr => usr.Name.Contains(userQueryParameters.Name));
-            }
-
-            if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))
-            {
-                query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email));
-            }
-
-            if (userQueryParameters.fromDate.HasValue && userQueryParameters.toDate.HasValue)
-            {
-                query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value 
-                                        && usr.RegistrationDate <= userQueryParameters.toDate.Value);
-            }
-            else if (userQueryParameters.fromDate.HasValue)
-            {
-                query = query.Where(usr => usr.RegistrationDate >= userQueryParameters.fromDate.Value);
-            }
-            else if (userQueryParameters.toDate.HasValue)
-            {
-                query = query.Where(usr => usr.RegistrationDate <= userQueryParameters.toDate.Value);
-            }
-
-            var result = query.ToList();
-
-            return result;
-        }
-
-        public User GetUser(int userId)
+    public bool CheckExistingEmail(string email)
+    {
+        var existingUser = _context.Users.FirstOrDefault(usr => usr.Email == email);
+        if (existingUser == null)
         {
-            var user = _context.Users.FirstOrDefault(usr => usr.IdNumber == userId);
-            return user;
+            return false;
         }
-
-
-        public void UpdateUser(User user)
-        {
-            // En EF Core, si el objeto ya está siendo rastreado, actualizar sus propiedades
-            // y llamar a SaveChanges() es suficiente para actualizarlo en la base de datos.
-            // Asegúrate de que el estado del objeto sea 'Modified' si es necesario.
-            _context.Entry(user).State = EntityState.Modified;
-        }
-
-        public void DeleteUser(int userId) 
-        {
-            var user = GetUser(userId);
-            if (user is null) {
-                throw new KeyNotFoundException("User not found.");
-            }
-            _context.Users.Remove(user);
-            SaveChanges();
-        }
-        
-        public void SaveChanges()
-        {
-            _context.SaveChanges();
-        }
-
-
+        return true;
+    }
 
     // public List<User>? UsersList = new();
     // private readonly string UserJsonPath;
