@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BookyBook.Models")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c48d12402e0d76d06849881900acd5c523cad3a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fdf9382b37ef0095521107b1e77f6262387165d6")]
 [assembly: System.Reflection.AssemblyProductAttribute("BookyBook.Models")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BookyBook.Models")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
