@@ -68,11 +68,8 @@ public class AuthService : IAuthService
     } 
     public bool HasAccessToResource(int requestedUserID, ClaimsPrincipal user) 
     {
-        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-        if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out int userId)) 
-        { 
-            return false; 
-        }
+        var userId = GetUserClaimId(user);
+        if (userId < 0) { return false; }
         var isOwnResource = userId == requestedUserID;
 
         var roleClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -81,6 +78,16 @@ public class AuthService : IAuthService
         
         var hasAccess = isOwnResource || isAdmin;
         return hasAccess;
+    }
+
+    public int GetUserClaimId(ClaimsPrincipal user)
+    {
+        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out int userId)) 
+        { 
+            return -1; 
+        }
+        return userId;
     }
 
 }

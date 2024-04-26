@@ -8,9 +8,13 @@ public class BorrowingService : IBorrowingService
 {
 
     private readonly IBorrowingRepository _repository;
-    public BorrowingService(IBorrowingRepository repository)
+    private readonly IUserRepository _userRepository;
+    private readonly IBookRepository _bookRepository;
+    public BorrowingService(IBorrowingRepository repository, IUserRepository userRepository, IBookRepository bookRepository)
     {
         _repository = repository;
+        _userRepository = userRepository;
+        _bookRepository = bookRepository;
     }
     public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters, string? sortBy)
     {
@@ -94,12 +98,34 @@ public class BorrowingService : IBorrowingService
         return _repository.GetBorrowing(borrowingId);
     }
 
-    public Borrowing AddBorrowing(BorrowingCreateDTO borrowingCreate)
+    public Borrowing MakeBorrowing(int bookId, int userId)
     {
-        var borrowing = new Borrowing(borrowingCreate.UserId, borrowingCreate.BookId);
-            _repository.AddBorrowing(borrowing);
-            _repository.SaveChanges();
-            return borrowing;
+        var book = _bookRepository.GetBook(bookId);
+        if (book == null)
+        {
+            throw new KeyNotFoundException($"Libro {bookId} no encontrado.");
+        }
+
+        var user = _userRepository.GetUser(userId);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
+        }
+
+        var foundedBorrowing = user.Borrowings.FirstOrDefault(b => b.BookId == bookId);
+        if (foundedBorrowing != null && !foundedBorrowing.Returned)
+        {
+            throw new ArgumentException($"Ya tienes el libro {userId}.");
+        }
+
+        book.Copies -= 1;
+        var borrowing = new Borrowing(userId, bookId);
+
+        _repository.AddBorrowing(borrowing);
+        _repository.SaveChanges();
+        _bookRepository.UpdateBook(book);
+        _bookRepository.SaveChanges();
+        return borrowing;
     }
 
     public void UpdateBorrowing(int borrowingId, BorrowingUpdateDTO borrowingUpdate)
@@ -115,6 +141,45 @@ public class BorrowingService : IBorrowingService
         borrowing.PenaltyFee = borrowingUpdate.PenaltyFee;
         _repository.UpdateBorrowing(borrowing);
         _repository.SaveChanges();
+    }
+
+     public void ReturnBook(int borrowingId)
+    {   
+        var borrowing = _repository.GetBorrowing(borrowingId);
+        if (borrowing == null)
+        {
+            throw new KeyNotFoundException($"Préstamo {borrowingId} no encontrado.");
+        }
+
+        var book = _bookRepository.GetBook(borrowing.BookId);
+        if (book == null)
+        {
+            throw new KeyNotFoundException($"Libro {borrowing.BookId} no encontrado.");
+        }
+
+        var user = _userRepository.GetUser(borrowing.UserId);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"Usuario {borrowing.UserId} no encontrado.");
+        }
+
+        borrowing.Returned = true;
+        borrowing.ReturnedDate = DateTime.Today;
+        book.Copies += 1;
+        if (borrowing.ReturnedDate > borrowing.DateToReturn)
+        {
+            TimeSpan difference = borrowing.ReturnedDate.Value.Subtract(borrowing.DateToReturn.Value);
+            double newPenalty = (double)difference.TotalDays * 1.25;
+            borrowing.PenaltyFee = (decimal)newPenalty;
+            user.PenaltyFee += (decimal)newPenalty;
+        }
+
+        _repository.UpdateBorrowing(borrowing);
+        _repository.SaveChanges();
+        _userRepository.UpdateUser(user);
+        _userRepository.SaveChanges();
+        _bookRepository.UpdateBook(book);
+        _bookRepository.SaveChanges();
     }
 
     public void DeleteBorrowing(int borrowingId)

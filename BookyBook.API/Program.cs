@@ -31,7 +31,7 @@ builder.Services.AddScoped<IBorrowingService, BorrowingService>();
 builder.Services.AddScoped<IBorrowingRepository, BorrowingRepository>();
 
 // Obteniendo la cadena de conexión desde appsettings.json
-var connectionString = builder.Configuration.GetConnectionString("ServerDB_azure");
+var connectionString = builder.Configuration.GetConnectionString("ServerDB_localhost");
 
 builder.Services.AddDbContext<BookyBookContext>(options =>
     options.UseSqlServer(connectionString)
