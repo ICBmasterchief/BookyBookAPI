@@ -58,7 +58,6 @@ public class BorrowingController : ControllerBase
         }
     }
 
-    //[Authorize(Roles = Roles.Admin)]
     [HttpPost()]
     public IActionResult CreateBorrowing([FromBody] BorrowingCreateDTO borrowingCreate)
     {
@@ -75,7 +74,6 @@ public class BorrowingController : ControllerBase
         
     }
     
-    //[Authorize(Roles = Roles.Admin)]
     [HttpPut("{borrowingId}")]
     public IActionResult UpdateBorrowing(int borrowingId, [FromBody] BorrowingUpdateDTO borrowingCreate)
     {

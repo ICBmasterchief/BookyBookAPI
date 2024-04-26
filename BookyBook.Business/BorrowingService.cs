@@ -112,6 +112,7 @@ public class BorrowingService : IBorrowingService
 
         borrowing.Returned = borrowingUpdate.Returned;
         borrowing.ReturnedDate = borrowingUpdate.ReturnedDate;
+        borrowing.PenaltyFee = borrowingUpdate.PenaltyFee;
         _repository.UpdateBorrowing(borrowing);
         _repository.SaveChanges();
     }

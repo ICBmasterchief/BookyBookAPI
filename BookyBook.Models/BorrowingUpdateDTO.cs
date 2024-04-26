@@ -10,5 +10,7 @@ public class BorrowingUpdateDTO
     public DateTime ReturnedDate { get; set; }
 
     public bool Returned { get; set; }
+
+    public decimal PenaltyFee { get; set; } = 0;
     
 }
