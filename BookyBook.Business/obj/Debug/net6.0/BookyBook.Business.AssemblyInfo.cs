@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BookyBook.Business")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e890d31d57e1d73359a54b38bbc938cc54625216")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8a7881a02d4d1aea83c0e812ac0f85c210b65f48")]
 [assembly: System.Reflection.AssemblyProductAttribute("BookyBook.Business")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BookyBook.Business")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
