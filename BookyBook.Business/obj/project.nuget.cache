@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "y58a7UOz2H+y1ZBxwFciQSDGZg0eJkHHKBEVuZ0Y4O4H54j5dPZvTcBfDZSsFw4uyyIIXqZs1tlYKeEoWGe3rw==",
+  "dgSpecHash": "K7KVF2TTuhdwavGTnsnUybxxIezML2rFDMO3C8CbTGOBVgUdQkRpjgQsnxnMchWBx99aVgzcfe0ekFABTgfG/Q==",
   "success": true,
-  "projectFilePath": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Business\\BookyBook.Business.csproj",
+  "projectFilePath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Business\\BookyBook.Business.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ignac\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
     "C:\\Users\\ignac\\.nuget\\packages\\microsoft.data.sqlclient\\2.1.4\\microsoft.data.sqlclient.2.1.4.nupkg.sha512",

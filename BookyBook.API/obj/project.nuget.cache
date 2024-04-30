@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "D23QqroijqXKBOkq5XLUIeb6qvoBcgN1b3rt3QEtACG4a/ZbO75nGdvD32acmzheleaIrQe2u5t3JkBwjWTUmg==",
+  "dgSpecHash": "c7K+SrNPL/45xDIQz5oXZ3aZue1WXkD/fWv2rk2cxZeWE6RLe9Zx72rEuuAKIz7e5D2NZfctFzU5BbgLARGIjg==",
   "success": true,
-  "projectFilePath": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.API\\BookyBook.API.csproj",
+  "projectFilePath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.API\\BookyBook.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ignac\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\ignac\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\6.0.29\\microsoft.aspnetcore.authentication.jwtbearer.6.0.29.nupkg.sha512",

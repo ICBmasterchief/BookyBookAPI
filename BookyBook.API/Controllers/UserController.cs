@@ -121,7 +121,7 @@ public class UserController : ControllerBase
         try
         {
             _userService.DeleteUser(userId);
-            return Ok(_userService.GetUser(userId));
+            return Ok($"Usuario {userId} eliminado");
         }
         catch (KeyNotFoundException ex)
         {

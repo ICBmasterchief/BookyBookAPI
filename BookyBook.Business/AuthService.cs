@@ -34,7 +34,7 @@ public class AuthService : IAuthService
     
     public string Login(LoginDTO loginDTO) {
         var user = _repository.GetUserFromCredentials(loginDTO);
-        if (user.Email == "ignaciocasaus1cns@gmail.com")
+        if (user.Email == "admin@admin.com")
         {
             user.Role = Roles.Admin;
         }

@@ -1946,8 +1946,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj": {
-              "projectPath": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj"
+            "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj": {
+              "projectPath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj"
             }
           }
         }
