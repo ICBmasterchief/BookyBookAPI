@@ -57,7 +57,7 @@ public class AuthService : IAuthService
                     new Claim("myCustomClaim", "myCustomClaimValue"),
                     // add other claims
                 }),
-            Expires = DateTime.UtcNow.AddDays(7), // AddMinutes(60)
+            Expires = DateTime.UtcNow.AddHours(1), // AddMinutes(60)
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 

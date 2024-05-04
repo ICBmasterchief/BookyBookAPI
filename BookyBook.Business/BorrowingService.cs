@@ -112,6 +112,11 @@ public class BorrowingService : IBorrowingService
             throw new KeyNotFoundException($"Usuario {userId} no encontrado.");
         }
 
+        if (book.Copies <= 0)
+        {
+            throw new ArgumentException($"No quedan copias disponibles del libro {bookId}.");
+        }
+
         var foundedBorrowing = user.Borrowings.FirstOrDefault(b => b.BookId == bookId);
         if (foundedBorrowing != null && !foundedBorrowing.Returned)
         {
