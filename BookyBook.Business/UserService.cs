@@ -146,6 +146,15 @@ public class UserService : IUserService
         _repository.SaveChanges();
     }
 
+    public void PayPenaltyFee(int userId)
+    {
+        var user = _repository.GetUser(userId);
+
+        user.PenaltyFee = 0;
+        _repository.UpdateUser(user);
+        _repository.SaveChanges();
+    }
+
     public void DeleteUser(int userId)
     {
         var user = _repository.GetUser(userId);

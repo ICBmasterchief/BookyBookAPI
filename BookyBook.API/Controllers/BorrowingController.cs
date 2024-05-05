@@ -124,7 +124,7 @@ public class BorrowingController : ControllerBase
         try
         {
             _borrowingService.DeleteBorrowing(borrowingId);
-            return Ok(_borrowingService.GetBorrowing(borrowingId));
+            return Ok($"Préstamo {borrowingId} eliminado");
         }
         catch (KeyNotFoundException ex)
         {

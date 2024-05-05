@@ -113,6 +113,24 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpPut("{userId}/paypenaltyfee")]
+    public IActionResult PayPenaltyFee(int userId)
+    {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
+        if (!_authService.HasAccessToResource(userId, HttpContext.User)) 
+            {return Forbid(); }
+        try
+        {
+            _userService.PayPenaltyFee(userId);
+            return Ok(_userService.GetUser(userId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogInformation(ex.ToString());
+            return NotFound("No encontrado el usuario " + userId);
+        }
+    }
+
     [HttpDelete("{userId}")]
     public IActionResult DeleteUser(int userId)
     {
