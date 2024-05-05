@@ -24,7 +24,7 @@ public class UserController : ControllerBase
 
     [Authorize(Roles = Roles.Admin)]
     [HttpGet(Name = "GetUsers")]
-    public ActionResult<IEnumerable<UserLogedDTO>> GetUsers([FromQuery] UserQueryParameters userQueryParameters, [FromQuery] string? sortBy)
+    public ActionResult<IEnumerable<UserLogedDTO>> AdminGetUsers([FromQuery] UserQueryParameters userQueryParameters, [FromQuery] string? sortBy)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
         try 
@@ -64,10 +64,12 @@ public class UserController : ControllerBase
     [HttpGet("{userId}", Name = "GetUser")]
     public IActionResult GetUser(int userId)
     {
+        
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+        if (!_authService.HasAccessToResource(userId, HttpContext.User)) 
+            {return Forbid(); }
         try
         {
-            if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
-
             var user = _userService.GetUser(userId);
             return Ok(user);
         }
@@ -80,7 +82,7 @@ public class UserController : ControllerBase
 
     [Authorize(Roles = Roles.Admin)]
     [HttpPost()]
-    public IActionResult CreateUser([FromBody] UserCreateDTO userCreateDTO)
+    public IActionResult AdminCreateUser([FromBody] UserCreateDTO userCreateDTO)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try {
@@ -134,12 +136,13 @@ public class UserController : ControllerBase
     [HttpDelete("{userId}")]
     public IActionResult DeleteUser(int userId)
     {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         if (!_authService.HasAccessToResource(userId, HttpContext.User)) 
             {return Forbid(); }
         try
         {
             _userService.DeleteUser(userId);
-            return Ok($"Usuario {userId} eliminado");
+            return Ok($"Usuario {userId} eliminado correctamente.");
         }
         catch (KeyNotFoundException ex)
         {

@@ -24,7 +24,7 @@ public class BorrowingController : ControllerBase
 
     [Authorize(Roles = Roles.Admin)]
     [HttpGet(Name = "GetBorrowings")]
-    public ActionResult<IEnumerable<Borrowing>> GetBorrowings([FromQuery] BorrowingQueryParameters borrowingQueryParameters, [FromQuery] string? sortBy)
+    public ActionResult<IEnumerable<Borrowing>> AdminGetBorrowings([FromQuery] BorrowingQueryParameters borrowingQueryParameters, [FromQuery] string? sortBy)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
         try 
@@ -79,7 +79,7 @@ public class BorrowingController : ControllerBase
     
     [Authorize(Roles = Roles.Admin)]
     [HttpPut("{borrowingId}")]
-    public IActionResult UpdateBorrowing(int borrowingId, [FromBody] BorrowingUpdateDTO borrowingCreate)
+    public IActionResult AdminUpdateBorrowing(int borrowingId, [FromBody] BorrowingUpdateDTO borrowingCreate)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try
@@ -119,12 +119,12 @@ public class BorrowingController : ControllerBase
 
     [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{borrowingId}")]
-    public IActionResult DeleteBorrowing(int borrowingId)
+    public IActionResult AdminDeleteBorrowing(int borrowingId)
     {
         try
         {
             _borrowingService.DeleteBorrowing(borrowingId);
-            return Ok($"Préstamo {borrowingId} eliminado");
+            return Ok($"Préstamo {borrowingId} eliminado correctamente.");
         }
         catch (KeyNotFoundException ex)
         {

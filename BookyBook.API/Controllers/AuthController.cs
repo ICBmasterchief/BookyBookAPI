@@ -21,10 +21,9 @@ public class AuthController : ControllerBase
     [HttpPost("Login")]
     public ActionResult<string> Login([FromBody] LoginDTO loginDTO)
     {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try
         {
-            if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
-
             var token = _authService.Login(loginDTO);
             return Ok(token);
         }
@@ -44,10 +43,9 @@ public class AuthController : ControllerBase
     [HttpPost("Register")]
     public IActionResult Register([FromBody] UserCreateDTO userCreateDTO)
     {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try
         {
-            if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
-
             var token = _authService.AddUser(userCreateDTO);
             return Ok(token);
         }
