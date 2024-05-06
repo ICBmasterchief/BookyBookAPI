@@ -37,13 +37,15 @@ services:
             - logs:/app/Logs
 
 
-   # web:
-        #container_name: webContainer
-   #     image: web:1.0
-    #    ports:
-     #       - 9000:8080 
-      #  depends_on:
-       #     - api
+    web:
+        image: icbmasterchief/bookybook-web
+        restart: unless-stopped
+        ports:
+            - 8080:80
+        depends_on:
+            - api
+        networks:
+            - bookybook
 
 volumes:
     db-data: {}
