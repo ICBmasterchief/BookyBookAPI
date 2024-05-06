@@ -19,9 +19,9 @@ public class BookService : IBookService
         var booksDTO = books.Select(b => new BookDTO
         {
             BookId = b.IdNumber,
-            Title = b.Title,
-            Author = b.Author,
-            Genre = b.Genre,
+            Title = b.Title.ToLower(),
+            Author = b.Author.ToLower(),
+            Genre = b.Genre.ToLower(),
             Year = b.Year,
             Copies = b.Copies,
             Score = b.Score,
