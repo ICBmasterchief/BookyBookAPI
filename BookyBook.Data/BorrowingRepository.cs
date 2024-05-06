@@ -22,7 +22,7 @@ public class BorrowingRepository: IBorrowingRepository
     {
         var borrowings = _context.Borrowings.ToList();
         if (borrowings is null) {
-            throw new InvalidOperationException("Error al intentar obtener los préstamos.");
+            throw new KeyNotFoundException("Error al intentar obtener los préstamos.");
         }
         return borrowings;
     }
@@ -31,7 +31,7 @@ public class BorrowingRepository: IBorrowingRepository
     {
         var borrowing = _context.Borrowings.FirstOrDefault(bk => bk.IdNumber == borrowingId);
         if (borrowing is null) {
-            throw new InvalidOperationException("No se ha encontrado el préstamo " + borrowingId);
+            throw new KeyNotFoundException("No se ha encontrado el préstamo " + borrowingId);
         }
         return borrowing;
     }

@@ -43,7 +43,7 @@ public class UserService : IUserService
 
         if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))
         {
-            query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email));
+            query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email.ToLower()));
         }
 
         if (userQueryParameters.fromDate.HasValue && userQueryParameters.toDate.HasValue)

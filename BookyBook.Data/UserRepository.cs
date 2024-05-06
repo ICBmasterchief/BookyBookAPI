@@ -87,7 +87,7 @@ public class UserRepository : IUserRepository
 
     public UserLogedDTO AddUserFromCredentials(UserCreateDTO userCreateDTO)
     {
-        var user = new UserLogedDTO { UserName = userCreateDTO.UserName, Email = userCreateDTO.Email, Role = Roles.Guest};
+        var user = new UserLogedDTO { UserName = userCreateDTO.UserName, Email = userCreateDTO.Email.ToLower(), Role = Roles.Guest};
         if (user == null)
         {
             throw new KeyNotFoundException("User not created.");
@@ -97,7 +97,7 @@ public class UserRepository : IUserRepository
     
     public User GetUserFromCredentials(LoginDTO loginDTO)
     {
-        var user = _context.Users.FirstOrDefault(usr => usr.Email == loginDTO.Email && usr.Password == loginDTO.Password);
+        var user = _context.Users.FirstOrDefault(usr => usr.Email.ToLower() == loginDTO.Email.ToLower() && usr.Password == loginDTO.Password);
         if (user == null)
         {
             throw new KeyNotFoundException("User not found.");
@@ -108,7 +108,7 @@ public class UserRepository : IUserRepository
 
     public bool CheckExistingEmail(string email)
     {
-        var existingUser = _context.Users.FirstOrDefault(usr => usr.Email == email);
+        var existingUser = _context.Users.FirstOrDefault(usr => usr.Email.ToLower() == email.ToLower());
         if (existingUser == null)
         {
             return false;

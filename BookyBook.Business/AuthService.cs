@@ -20,11 +20,11 @@ public class AuthService : IAuthService
 
     public string AddUser(UserCreateDTO userCreateDTO)
     {   
-        if (_repository.CheckExistingEmail(userCreateDTO.Email))
+        if (_repository.CheckExistingEmail(userCreateDTO.Email.ToLower()))
         {
-          throw new KeyNotFoundException($"El email {userCreateDTO.Email} ya existe");   
+          throw new KeyNotFoundException($"El email {userCreateDTO.Email.ToLower()} ya existe");   
         }
-        var user = new User(userCreateDTO.UserName, userCreateDTO.Email, userCreateDTO.Password);
+        var user = new User(userCreateDTO.UserName, userCreateDTO.Email.ToLower(), userCreateDTO.Password);
         _repository.AddUser(user);
         _repository.SaveChanges();
         var newUser = _repository.AddUserFromCredentials(userCreateDTO);
@@ -34,11 +34,11 @@ public class AuthService : IAuthService
     
     public string Login(LoginDTO loginDTO) {
         var user = _repository.GetUserFromCredentials(loginDTO);
-        if (user.Email == "admin@admin.com")
+        if (user.Email.ToLower() == "admin@admin.com")
         {
             user.Role = Roles.Admin;
         }
-        var userLogin = new UserLogedDTO {UserId = user.IdNumber, UserName = user.Name, Email = user.Email, RegistrationDate = user.RegistrationDate, PenaltyFee = user.PenaltyFee, Borrowings = user.Borrowings, Role = user.Role};
+        var userLogin = new UserLogedDTO {UserId = user.IdNumber, UserName = user.Name, Email = user.Email.ToLower(), RegistrationDate = user.RegistrationDate, PenaltyFee = user.PenaltyFee, Borrowings = user.Borrowings, Role = user.Role};
         return GenerateToken(userLogin);
     }
 
@@ -53,7 +53,7 @@ public class AuthService : IAuthService
                     new Claim(ClaimTypes.NameIdentifier, Convert.ToString(userLogedDTO.UserId)),
                     new Claim(ClaimTypes.Name, userLogedDTO.UserName),
                     new Claim(ClaimTypes.Role, userLogedDTO.Role),
-                    new Claim(ClaimTypes.Email, userLogedDTO.Email),
+                    new Claim(ClaimTypes.Email, userLogedDTO.Email.ToLower()),
                     new Claim("myCustomClaim", "myCustomClaimValue"),
                     // add other claims
                 }),

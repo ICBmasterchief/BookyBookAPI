@@ -113,7 +113,7 @@ public class BorrowingController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             _logger.LogInformation(ex.ToString());
-           return NotFound("No se ha podido actualizar el préstamo");
+           return NotFound("No se ha podido devolver el libro.");
         }
     }
 

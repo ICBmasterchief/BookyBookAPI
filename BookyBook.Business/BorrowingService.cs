@@ -141,11 +141,24 @@ public class BorrowingService : IBorrowingService
             throw new KeyNotFoundException($"Préstamo {borrowingId} no encontrado.");
         }
 
+        var user = _userRepository.GetUser(borrowing.UserId);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"Usuario {borrowing.UserId} no encontrado.");
+        }
+        
+        user.PenaltyFee -= borrowing.PenaltyFee;
+
         borrowing.Returned = borrowingUpdate.Returned;
         borrowing.ReturnedDate = borrowingUpdate.ReturnedDate;
         borrowing.PenaltyFee = borrowingUpdate.PenaltyFee;
+
+        user.PenaltyFee += borrowing.PenaltyFee;
+
         _repository.UpdateBorrowing(borrowing);
+        _userRepository.UpdateUser(user);
         _repository.SaveChanges();
+        _userRepository.SaveChanges();
     }
 
      public void ReturnBook(int borrowingId)
