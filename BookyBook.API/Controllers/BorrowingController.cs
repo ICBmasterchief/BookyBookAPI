@@ -55,7 +55,7 @@ public class BorrowingController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             _logger.LogInformation(ex.ToString());
-           return NotFound("No encontrado el libro " + borrowingId);
+           return NotFound("No encontrado el préstamo " + borrowingId);
         }
     }
 
