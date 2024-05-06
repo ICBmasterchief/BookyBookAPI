@@ -27,7 +27,7 @@ public class UserService : IUserService
         var usersDTO = users.Select(u => new UserLogedDTO
         {
             UserId = u.IdNumber,
-            UserName = u.Name.ToLower(),
+            UserName = u.Name,
             Email = u.Email.ToLower(),
             RegistrationDate = u.RegistrationDate,
             PenaltyFee = u.PenaltyFee,
@@ -38,7 +38,7 @@ public class UserService : IUserService
 
         if (!string.IsNullOrWhiteSpace(userQueryParameters.Name))
         {
-            query = query.Where(usr => usr.UserName.Contains(userQueryParameters.Name.ToLower()));
+            query = query.Where(usr => usr.UserName.ToLower().Contains(userQueryParameters.Name.ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))

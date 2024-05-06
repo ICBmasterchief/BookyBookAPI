@@ -80,23 +80,6 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Roles = Roles.Admin)]
-    [HttpPost()]
-    public IActionResult AdminCreateUser([FromBody] UserCreateDTO userCreateDTO)
-    {
-        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
-        try {
-            _authService.AddUser(userCreateDTO);
-            return Ok(userCreateDTO);
-        }     
-        catch (Exception ex)
-        {
-            _logger.LogInformation(ex.ToString());
-            return BadRequest(ex.Message);
-        }
-        
-    }
-
     [HttpPut("{userId}")]
     public IActionResult UpdateUser(int userId, [FromBody] UserUpdateDTO userUpdate)
     {

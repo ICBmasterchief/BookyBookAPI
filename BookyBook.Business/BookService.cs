@@ -19,9 +19,9 @@ public class BookService : IBookService
         var booksDTO = books.Select(b => new BookDTO
         {
             BookId = b.IdNumber,
-            Title = b.Title.ToLower(),
-            Author = b.Author.ToLower(),
-            Genre = b.Genre.ToLower(),
+            Title = b.Title,
+            Author = b.Author,
+            Genre = b.Genre,
             Year = b.Year,
             Copies = b.Copies,
             Score = b.Score,
@@ -31,17 +31,17 @@ public class BookService : IBookService
 
         if (!string.IsNullOrWhiteSpace(bookQueryParameters.Title))
         {
-            query = query.Where(bk => bk.Title.Contains(bookQueryParameters.Title.ToLower()));
+            query = query.Where(bk => bk.Title.ToLower().Contains(bookQueryParameters.Title.ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(bookQueryParameters.Author))
         {
-            query = query.Where(bk => bk.Author.Contains(bookQueryParameters.Author.ToLower()));
+            query = query.Where(bk => bk.Author.ToLower().Contains(bookQueryParameters.Author.ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(bookQueryParameters.Genre))
         {
-            query = query.Where(bk => bk.Genre.Contains(bookQueryParameters.Genre.ToLower()));
+            query = query.Where(bk => bk.Genre.ToLower().Contains(bookQueryParameters.Genre.ToLower()));
         }
 
         if (bookQueryParameters.fromYear.HasValue && bookQueryParameters.toYear.HasValue)
