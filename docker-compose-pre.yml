@@ -1,0 +1,58 @@
+version: '3.4'
+
+networks:
+    bookybook-pre:
+
+services:
+    db-pre: 
+        image: mcr.microsoft.com/mssql/server:2019-CU21-ubuntu-20.04
+        restart: always 
+        ports:
+            - 1977:1433
+        environment:
+            - ACCEPT_EULA=Y
+            - MSSQL_SA_PASSWORD=<YourStrong@Passw0rd>
+        networks:
+            - bookybook-pre
+        volumes:
+            - db-data-pre:/var/opt/mssql
+        healthcheck:
+            test: ["CMD", "sqlcmd", "-U", "sa", "-P", "<YourStrong@Passw0rd>", "-Q", "SELECT 1"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+
+    api-pre:
+        restart: unless-stopped 
+        ports:
+            - 7791:80 
+        build: 
+          context: .
+          dockerfile: Dockerfile
+        depends_on:
+            - db-pre
+        networks:
+            - bookybook-pre
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        volumes:
+            - logs-pre:/app/Logs
+
+    web-pre:
+        image: icbmasterchief/bookybook-web-pre
+        restart: unless-stopped
+        ports:
+            - 8081:80
+        depends_on:
+            - api-pre
+        networks:
+            - bookybook-pre
+
+volumes:
+    db-data-pre: {}
+    logs-pre:
+      driver: local 
+      driver_opts:
+        type: none
+        device: ./Logs
+        o: bind

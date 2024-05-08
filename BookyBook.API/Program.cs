@@ -31,6 +31,7 @@ builder.Services.AddScoped<IBorrowingService, BorrowingService>();
 builder.Services.AddScoped<IBorrowingRepository, BorrowingRepository>();
 
 // Obteniendo la cadena de conexión desde appsettings.json
+//var connectionString = builder.Configuration.GetConnectionString("ServerDB_localhost");
 //var connectionString = builder.Configuration.GetConnectionString("ServerDB_dockernet");
 var connectionString = builder.Configuration.GetConnectionString("ServerDB_azure");
 
@@ -42,7 +43,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "BookyBookAPI", Version = "v1" });
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "BookyBookAPI-PRE", Version = "v1" });
     opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -96,7 +97,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment()) //DISABLE DUE TO CONTAINERING APP
+if (app.Environment.IsDevelopment()) //DISABLE DUE TO CONTAINERING APP
 {
     app.UseSwagger();
     app.UseSwaggerUI();
