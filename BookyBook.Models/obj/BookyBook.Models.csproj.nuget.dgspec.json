@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj": {}
+    "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj": {}
   },
   "projects": {
-    "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj": {
+    "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj",
+        "projectUniqueName": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj",
         "projectName": "BookyBook.Models",
-        "projectPath": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj",
+        "projectPath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj",
         "packagesPath": "C:\\Users\\ignac\\.nuget\\packages\\",
-        "outputPath": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\obj\\",
+        "outputPath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ignac\\AppData\\Roaming\\NuGet\\NuGet.Config"

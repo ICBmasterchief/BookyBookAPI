@@ -24,7 +24,7 @@ public class UserController : ControllerBase
 
     [Authorize(Roles = Roles.Admin)]
     [HttpGet(Name = "GetUsers")]
-    public ActionResult<IEnumerable<UserLogedDTO>> GetUsers([FromQuery] UserQueryParameters userQueryParameters, [FromQuery] string? sortBy)
+    public ActionResult<IEnumerable<UserLogedDTO>> AdminGetUsers([FromQuery] UserQueryParameters userQueryParameters, [FromQuery] string? sortBy)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
         try 
@@ -64,10 +64,12 @@ public class UserController : ControllerBase
     [HttpGet("{userId}", Name = "GetUser")]
     public IActionResult GetUser(int userId)
     {
+        
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
+        if (!_authService.HasAccessToResource(userId, HttpContext.User)) 
+            {return Forbid(); }
         try
         {
-            if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
-
             var user = _userService.GetUser(userId);
             return Ok(user);
         }
@@ -76,23 +78,6 @@ public class UserController : ControllerBase
             _logger.LogInformation(ex.ToString());
            return NotFound(ex.Message);
         }
-    }
-
-    [Authorize(Roles = Roles.Admin)]
-    [HttpPost()]
-    public IActionResult CreateUser([FromBody] UserCreateDTO userCreateDTO)
-    {
-        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
-        try {
-            _authService.AddUser(userCreateDTO);
-            return Ok(userCreateDTO);
-        }     
-        catch (Exception ex)
-        {
-            _logger.LogInformation(ex.ToString());
-            return BadRequest(ex.Message);
-        }
-        
     }
 
     [HttpPut("{userId}")]
@@ -113,15 +98,34 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpPut("{userId}/paypenaltyfee")]
+    public IActionResult PayPenaltyFee(int userId)
+    {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
+        if (!_authService.HasAccessToResource(userId, HttpContext.User)) 
+            {return Forbid(); }
+        try
+        {
+            _userService.PayPenaltyFee(userId);
+            return Ok(_userService.GetUser(userId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogInformation(ex.ToString());
+            return NotFound("No encontrado el usuario " + userId);
+        }
+    }
+
     [HttpDelete("{userId}")]
     public IActionResult DeleteUser(int userId)
     {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         if (!_authService.HasAccessToResource(userId, HttpContext.User)) 
             {return Forbid(); }
         try
         {
             _userService.DeleteUser(userId);
-            return Ok(_userService.GetUser(userId));
+            return Ok($"Usuario {userId} eliminado correctamente.");
         }
         catch (KeyNotFoundException ex)
         {

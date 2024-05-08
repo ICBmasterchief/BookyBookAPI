@@ -31,17 +31,17 @@ public class BookService : IBookService
 
         if (!string.IsNullOrWhiteSpace(bookQueryParameters.Title))
         {
-            query = query.Where(bk => bk.Title.Contains(bookQueryParameters.Title));
+            query = query.Where(bk => bk.Title.ToLower().Contains(bookQueryParameters.Title.ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(bookQueryParameters.Author))
         {
-            query = query.Where(bk => bk.Author.Contains(bookQueryParameters.Author));
+            query = query.Where(bk => bk.Author.ToLower().Contains(bookQueryParameters.Author.ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(bookQueryParameters.Genre))
         {
-            query = query.Where(bk => bk.Genre.Contains(bookQueryParameters.Genre));
+            query = query.Where(bk => bk.Genre.ToLower().Contains(bookQueryParameters.Genre.ToLower()));
         }
 
         if (bookQueryParameters.fromYear.HasValue && bookQueryParameters.toYear.HasValue)

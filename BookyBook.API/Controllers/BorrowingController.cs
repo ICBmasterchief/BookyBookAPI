@@ -24,7 +24,7 @@ public class BorrowingController : ControllerBase
 
     [Authorize(Roles = Roles.Admin)]
     [HttpGet(Name = "GetBorrowings")]
-    public ActionResult<IEnumerable<Borrowing>> GetBorrowings([FromQuery] BorrowingQueryParameters borrowingQueryParameters, [FromQuery] string? sortBy)
+    public ActionResult<IEnumerable<Borrowing>> AdminGetBorrowings([FromQuery] BorrowingQueryParameters borrowingQueryParameters, [FromQuery] string? sortBy)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
         try 
@@ -40,30 +40,33 @@ public class BorrowingController : ControllerBase
         }
     }
 
-    [Authorize(Roles = Roles.Admin)]
+
     [HttpGet("{borrowingId}", Name = "GetBorrowing")]
     public IActionResult GetBorrowing(int borrowingId)
     {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try
-        {
-            if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
-
+        { 
             var borrowing = _borrowingService.GetBorrowing(borrowingId);
+            if (!_authService.HasAccessToResource(borrowing.UserId, HttpContext.User)) 
+            {return Forbid(); }
             return Ok(borrowing);
         }
         catch (KeyNotFoundException ex)
         {
             _logger.LogInformation(ex.ToString());
-           return NotFound("No encontrado el libro " + borrowingId);
+           return NotFound("No encontrado el préstamo " + borrowingId);
         }
     }
 
     [HttpPost()]
-    public IActionResult CreateBorrowing([FromBody] BorrowingCreateDTO borrowingCreate)
+    public IActionResult MakeBorrowing(int bookId)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
         try {
-            var borrowing = _borrowingService.AddBorrowing(borrowingCreate);
+            var userId = _authService.GetUserClaimId(HttpContext.User);
+            if (userId < 0) {return BadRequest(); }
+            var borrowing = _borrowingService.MakeBorrowing(bookId, userId);
             return Ok(borrowing);
         }     
         catch (Exception ex)
@@ -74,8 +77,9 @@ public class BorrowingController : ControllerBase
         
     }
     
+    [Authorize(Roles = Roles.Admin)]
     [HttpPut("{borrowingId}")]
-    public IActionResult UpdateBorrowing(int borrowingId, [FromBody] BorrowingUpdateDTO borrowingCreate)
+    public IActionResult AdminUpdateBorrowing(int borrowingId, [FromBody] BorrowingUpdateDTO borrowingCreate)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try
@@ -93,14 +97,34 @@ public class BorrowingController : ControllerBase
         }
     }
 
+    [HttpPut("{borrowingId}/return")]
+    public IActionResult ReturnBook(int borrowingId)
+    {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
+        try
+        {
+            var borrowing = _borrowingService.GetBorrowing(borrowingId);
+            if (!_authService.HasAccessToResource(borrowing.UserId, HttpContext.User)) 
+                {return Forbid(); }
+            if (borrowing.Returned) {return BadRequest("Este libro ya fue devuelto."); }
+            _borrowingService.ReturnBook(borrowingId);
+            return Ok(_borrowingService.GetBorrowing(borrowingId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogInformation(ex.ToString());
+           return NotFound("No se ha podido devolver el libro.");
+        }
+    }
+
     [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{borrowingId}")]
-    public IActionResult DeleteBorrowing(int borrowingId)
+    public IActionResult AdminDeleteBorrowing(int borrowingId)
     {
         try
         {
             _borrowingService.DeleteBorrowing(borrowingId);
-            return Ok(_borrowingService.GetBorrowing(borrowingId));
+            return Ok($"Préstamo {borrowingId} eliminado correctamente.");
         }
         catch (KeyNotFoundException ex)
         {

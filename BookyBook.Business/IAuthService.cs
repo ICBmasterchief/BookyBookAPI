@@ -9,4 +9,5 @@ public interface IAuthService
     public string Login(LoginDTO loginDTO);
     public string GenerateToken(UserLogedDTO userLogedDTO);
     public bool HasAccessToResource(int requestedUserID, ClaimsPrincipal user);
+    public int GetUserClaimId(ClaimsPrincipal user);
 }

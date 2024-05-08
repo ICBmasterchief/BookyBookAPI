@@ -44,7 +44,7 @@ public class BookRepository : IBookRepository
     {
         var book = _context.Books.FirstOrDefault(bk => bk.IdNumber == bookId);
         if (book is null) {
-            throw new InvalidOperationException("No se ha encontrado el libro " + bookId);
+            throw new KeyNotFoundException("No se ha encontrado el libro " + bookId);
         }
         return book;
     }

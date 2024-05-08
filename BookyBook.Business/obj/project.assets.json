@@ -1946,11 +1946,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Business\\BookyBook.Business.csproj",
+      "projectUniqueName": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Business\\BookyBook.Business.csproj",
       "projectName": "BookyBook.Business",
-      "projectPath": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Business\\BookyBook.Business.csproj",
+      "projectPath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Business\\BookyBook.Business.csproj",
       "packagesPath": "C:\\Users\\ignac\\.nuget\\packages\\",
-      "outputPath": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Business\\obj\\",
+      "outputPath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Business\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ignac\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -1965,11 +1965,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Data\\BookyBook.Data.csproj": {
-              "projectPath": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Data\\BookyBook.Data.csproj"
+            "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Data\\BookyBook.Data.csproj": {
+              "projectPath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Data\\BookyBook.Data.csproj"
             },
-            "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj": {
-              "projectPath": "a:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj"
+            "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj": {
+              "projectPath": "A:\\CURSO DAW\\Desarrollo web en entorno servidor\\proyectos dotnet\\BookyBookAPI\\BookyBook.Models\\BookyBook.Models.csproj"
             }
           }
         }

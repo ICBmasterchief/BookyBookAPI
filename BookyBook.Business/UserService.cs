@@ -28,7 +28,7 @@ public class UserService : IUserService
         {
             UserId = u.IdNumber,
             UserName = u.Name,
-            Email = u.Email,
+            Email = u.Email.ToLower(),
             RegistrationDate = u.RegistrationDate,
             PenaltyFee = u.PenaltyFee,
             Role = u.Role,
@@ -38,12 +38,12 @@ public class UserService : IUserService
 
         if (!string.IsNullOrWhiteSpace(userQueryParameters.Name))
         {
-            query = query.Where(usr => usr.UserName.Contains(userQueryParameters.Name));
+            query = query.Where(usr => usr.UserName.ToLower().Contains(userQueryParameters.Name.ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(userQueryParameters.Email))
         {
-            query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email));
+            query = query.Where(usr => usr.Email.Contains(userQueryParameters.Email.ToLower()));
         }
 
         if (userQueryParameters.fromDate.HasValue && userQueryParameters.toDate.HasValue)
@@ -94,7 +94,7 @@ public class UserService : IUserService
 
         switch (sortBy.ToLower())
         {
-        case "borrowwingdate":
+        case "borrowingdate":
             query = query.OrderBy(bw => bw.BorrowingDate);
             break;
         case "datetoreturn":
@@ -142,6 +142,15 @@ public class UserService : IUserService
 
         user.Name = userUpdate.Name;
         user.Password = userUpdate.Password;
+        _repository.UpdateUser(user);
+        _repository.SaveChanges();
+    }
+
+    public void PayPenaltyFee(int userId)
+    {
+        var user = _repository.GetUser(userId);
+
+        user.PenaltyFee = 0;
         _repository.UpdateUser(user);
         _repository.SaveChanges();
     }

@@ -41,7 +41,7 @@ public class BookController : ControllerBase
 
     [Authorize(Roles = Roles.Admin)]
     [HttpGet("{bookId}/borrowings", Name = "GetBorrowingsByBookId")]
-    public IActionResult GetBorrowingsByBookId(int bookId, [FromQuery] BookQueryParameters bookQueryParameters, [FromQuery] string? sortBy)
+    public IActionResult AdminGetBorrowingsByBookId(int bookId, [FromQuery] BookQueryParameters bookQueryParameters, [FromQuery] string? sortBy)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
         try
@@ -61,28 +61,16 @@ public class BookController : ControllerBase
     [HttpGet("{bookId}", Name = "GetBook")]
     public IActionResult GetBook(int bookId)
     {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try
-        {
-            if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
-
+        {  
             var book = _bookService.GetBook(bookId);
-
             return Ok(book);
         }
         catch (KeyNotFoundException ex)
         {
             _logger.LogInformation(ex.ToString());
            return NotFound("No se ha encontrado el libro " + bookId);
-        }
-        catch (ArgumentNullException ex)
-        {
-            _logger.LogInformation(ex.ToString());
-            return NotFound("No se ha encontrado el libro " + bookId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogInformation(ex.ToString());
-            return BadRequest("Error obteniendo el libro " + bookId);
         }
     }
 
@@ -104,7 +92,7 @@ public class BookController : ControllerBase
 
     [Authorize(Roles = Roles.Admin)]
     [HttpPut("{bookId}", Name = "UpdateBook")]
-    public IActionResult UpdateBook(int bookId, [FromBody] BookUpdateDTO bookUpdate)
+    public IActionResult AdminUpdateBook(int bookId, [FromBody] BookUpdateDTO bookUpdate)
     {
         if (!ModelState.IsValid)  {return BadRequest(ModelState); } 
         try
@@ -131,23 +119,24 @@ public class BookController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             _logger.LogInformation(ex.ToString());
-           return NotFound("No se ha podudo actualizar el libro");
+           return NotFound("No se ha podudo actualizar el libro.");
         }
     }
 
     [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{bookId}")]
-    public IActionResult DeleteBook(int bookId)
+    public IActionResult AdminDeleteBook(int bookId)
     {
+        if (!ModelState.IsValid)  {return BadRequest(ModelState); }
         try
         {
             _bookService.DeleteBook(bookId);
-            return Ok(_bookService.GetBook(bookId));
+            return Ok($"Libro {bookId} eliminado correctamente.");
         }
         catch (KeyNotFoundException ex)
         {
             _logger.LogInformation(ex.ToString());
-            return NotFound("No se ha podido eliminar el libro");
+            return NotFound("No se ha podido eliminar el libro.");
         }
     }
 }

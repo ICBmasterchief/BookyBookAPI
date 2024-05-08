@@ -5,10 +5,11 @@ namespace BookyBook.Business;
 public interface IBorrowingService
 {
 
-    public Borrowing AddBorrowing(BorrowingCreateDTO borrowingCreate);
+    public Borrowing MakeBorrowing(int bookId, int userId);
     public IEnumerable<Borrowing> GetAllBorrowings(BorrowingQueryParameters? borrowingQueryParameters, string? sortBy);
     public Borrowing GetBorrowing(int borrowingId);
     public void UpdateBorrowing(int borrowingId, BorrowingUpdateDTO borrowingUpdate);
+    public void ReturnBook(int borrowingId);
     public void DeleteBorrowing(int borrowingId);
 
     // public void BorrowBook();
